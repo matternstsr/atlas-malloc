@@ -13,7 +13,6 @@ void *naive_malloc(size_t size) {
     if (size == 0) return NULL;
 
     size_t aligned_size = ALIGN_SIZE(size + BLOCK_HEADER_SIZE);
-    Block *prev = NULL;
     Block *current = free_list;
 
     /* Search free list for a suitable block */
@@ -32,7 +31,6 @@ void *naive_malloc(size_t size) {
             current->free = 0;
             return (char *)current + BLOCK_HEADER_SIZE;
         }
-        prev = current;
         current = current->next;
     }
 
@@ -68,26 +66,9 @@ void naive_free(void *ptr) {
     Block *block_to_free = (Block *)((char *)ptr - BLOCK_HEADER_SIZE);
     block_to_free->free = 1;
 
-    /* Coalesce adjacent free blocks */
-    Block *current = free_list;
-    Block *prev = NULL;
+    /* Add to the free list */
+    block_to_free->next = free_list;
+    free_list = block_to_free;
 
-    while (current && current < block_to_free) {
-        prev = current;
-        current = current->next;
-    }
-
-    if (prev) {
-        prev->next = block_to_free;
-    } else {
-        free_list = block_to_free;
-    }
-
-    block_to_free->next = current;
-
-    /* Attempt to coalesce free blocks */
-    if (block_to_free->next && block_to_free->next->free) {
-        block_to_free->size += BLOCK_HEADER_SIZE + block_to_free->next->size;
-        block_to_free->next = block_to_free->next->next;
-    }
+    /* Optionally, coalesce adjacent free blocks here */
 }
