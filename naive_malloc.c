@@ -1,9 +1,5 @@
 #include "malloc.h"
 
-size_t align_size(size_t size) {
-    return ((size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
-}
-
 /**
  * naive_malloc - Allocates memory in the heap
  * @size: size of memory to allocate
@@ -24,7 +20,7 @@ void *naive_malloc(size_t size)
         return NULL;
 
     /* Align size to the next page boundary */
-    aligned_size = align_size(size + sizeof(size_t));
+    aligned_size = ALIGN_SIZE(size + sizeof(size_t));
 
     /* Initialize heap_end if this is the first call */
     if (heap_end == NULL)
@@ -35,6 +31,7 @@ void *naive_malloc(size_t size)
     }
 
     prev_heap_end = heap_end;
+
     /* Extend heap if not enough space */
     if (sbrk(aligned_size) == (void *)-1)
         return NULL; /* sbrk failed */
@@ -44,7 +41,9 @@ void *naive_malloc(size_t size)
     *(size_t *)prev_heap_end = aligned_size;
     
     /* Return pointer to the memory after the block header */
-    ptr = (char *)prev_heap_end + sizeof(size_t);
-
+    /* ptr = (char *)prev_heap_end + sizeof(size_t); */
+    ptr = (char *)prev_heap_end + (sizeof(size_t));
+    /* ptr = (char *)prev_heap_end; */
+    
     return ptr;
 }
