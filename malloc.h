@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /* start with 4096 page size */
-#define PAGE_SIZE 8
+#define PAGE_SIZE 4096
 
 /* Make the "size" to the next size up of PAGE_SIZE */
 /* #define ALIGN_SIZE(size) (((size) + sizeof(Block) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)) */
