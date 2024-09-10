@@ -45,5 +45,11 @@ void *naive_malloc(size_t size)
     ptr = (char *)prev_heap_end + (sizeof(size_t));
     /* ptr = (char *)prev_heap_end; */
 
+    printf("Requested size: %zu\n", size);
+    printf("Aligned size: %zu\n", aligned_size);
+    printf("Previous heap end: %p\n", prev_heap_end);
+    printf("New heap end after sbrk: %p\n", (char *)prev_heap_end + aligned_size);
+
+
     return ptr;
 }
