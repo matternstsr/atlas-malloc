@@ -1,5 +1,7 @@
 #include "malloc.h"
 
+Block *free_list = NULL;
+
 void *naive_malloc(size_t size)
 {
     static void *heap_end = NULL;
