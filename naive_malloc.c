@@ -36,9 +36,3 @@ void *naive_malloc(size_t size)
 	/*  moved  */
 	return (ptr);
 }
-
-
-
-
-
-
