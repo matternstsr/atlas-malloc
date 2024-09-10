@@ -13,8 +13,8 @@ void *naive_malloc(size_t size)
     /* Align size to the next page boundary, including the size of the block header */
     aligned_size = ALIGN_SIZE(size + sizeof(size_t));
 
-    /* if (heap_end == NULL) */
-        /* heap_end = sbrk(0); */  /* Make the heap_end to whatever break is at this time */
+    if (heap_end == NULL)
+        heap_end = sbrk(0);  /* Make the heap_end to whatever break is at this time */
 
     prev_heap_end = heap_end;
     if (sbrk(aligned_size) == (void *)-1)
