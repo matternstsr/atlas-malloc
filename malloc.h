@@ -17,7 +17,7 @@ typedef struct Block {
 } Block;
 
 /* free_list */
-/* extern Block *free_list; */
+extern Block *free_list;
 
 void *naive_malloc(size_t size);
 void *_malloc(size_t size);
