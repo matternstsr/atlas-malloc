@@ -5,13 +5,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* Align size to the next page boundary */
-#define PAGE_SIZE 4096
-#define ALIGN_SIZE(size) (((size) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+/* Align size to 8 bytes */
+#define ALIGN_SIZE(size) (((size) + 7) & ~7)  // Align to 8 bytes
 
 /* Struct for memory blocks */
 typedef struct Block {
-    size_t size;         /* Size of the block */
+    size_t size;         /* Size of the block including header */
     struct Block *next;  /* Pointer to the next block in the free list */
     int free;            /* Free status (1 if free, 0 if used) */
 } Block;

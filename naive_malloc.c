@@ -15,7 +15,7 @@ void *naive_malloc(size_t size) {
 
     if (size == 0) return NULL;
 
-    /* Align size to the next page boundary */
+    /* Align size to 8 bytes */
     aligned_size = ALIGN_SIZE(size + sizeof(Block));
 
     /* Check free list for a suitable block */
