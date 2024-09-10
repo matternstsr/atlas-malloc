@@ -1,36 +1,23 @@
 #ifndef MALLOC_H
 #define MALLOC_H
+
 #include <unistd.h>
 #include <stddef.h>
 #include <stdint.h>
 
-/* start with 4096 page size */
-#define PAGE_SIZE 8
-
-/* #define PAGE_SIZE 8 */
-/* Heap might be extended too freq & could make issue with heap_end not rem const. */
-/* Make the "size" to the next size up of PAGE_SIZE */
-/* #define ALIGN_SIZE(size) (((size) + sizeof(Block) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)) */
-
-/* Make the "size" to the next size up of PAGE_SIZE */
+/* Align size to the next page boundary */
+#define PAGE_SIZE 4096
 #define ALIGN_SIZE(size) (((size) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
-
 /* Struct for memory blocks */
-typedef struct Block
-{
-    size_t size;
-    struct Block *next;
+typedef struct Block {
+    size_t size;         /* Size of the block */
+    struct Block *next;  /* Pointer to the next block in the free list */
+    int free;            /* Free status (1 if free, 0 if used) */
 } Block;
 
-/* free_list */
-/* extern Block *free_list;
- */
+/* Functions for memory management */
 void *naive_malloc(size_t size);
-void *_malloc(size_t size);
-void _free(void *ptr);
+void naive_free(void *ptr);
 
 #endif /* MALLOC_H */
-
-
-
