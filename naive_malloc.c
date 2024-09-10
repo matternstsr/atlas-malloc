@@ -15,7 +15,7 @@ void *naive_malloc(size_t size)
     if (size == 0)
         return NULL;
 
-    /* Align size to the next page boundary, including the size of the block header */
+    /* Align size to the next 8-byte boundary, including the size of the block header */
     aligned_size = ALIGN_SIZE(size + sizeof(Block));
 
     if (heap_end == NULL)
@@ -34,5 +34,6 @@ void *naive_malloc(size_t size)
 
     /* Return the memory after the block header */
     ptr = (char *)block + sizeof(Block);
+
     return ptr;
 }
