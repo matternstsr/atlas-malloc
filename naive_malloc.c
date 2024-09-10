@@ -1,7 +1,7 @@
 #include "malloc.h"
 
 static void *heap_end = NULL;
-
+static Block *free_list = NULL;
 
 void *naive_malloc(size_t size)
 {
@@ -32,7 +32,8 @@ void *naive_malloc(size_t size)
     prev_heap_end = heap_end;
     /* Extend heap if there is not enough space */
     if (sbrk(aligned_size) == (void *)-1)
-        return NULL; /* sbrk failed */
+        return NULL; /* sbrk failed
+ */
     heap_end = (char *)heap_end + aligned_size; /* Update heap_end */
 
     /* Initialize the new block */
