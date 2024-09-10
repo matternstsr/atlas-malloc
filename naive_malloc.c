@@ -16,7 +16,7 @@ void *naive_malloc(size_t size)
         return NULL;
 
     /* Align size to the next 8-byte boundary, including the size of the block header */
-    aligned_size = ALIGN_SIZE(size + sizeof(Block));
+    aligned_size = ((size + sizeof(Block) + 7) & ~7);
 
     if (heap_end == NULL)
         heap_end = sbrk(0);  /* Initialize heap_end to the current end of the heap */
