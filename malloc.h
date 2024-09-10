@@ -5,15 +5,16 @@
 #include <stdint.h>
 
 /* start with 4096 page size */
-#define PAGE_SIZE 4096
+#define PS 4096
 
-/* Make the "size" to the next size up of PAGE_SIZE */
-#define ALIGN_SIZE(size) (((size) + sizeof(Block) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+/* Make the "size" to the next size up of PS */
+#define ALIGN_SIZE(size) (((size) + sizeof(Block) + PS - 1) & ~(PS - 1))
 
 /* Struct for memory blocks */
-typedef struct Block {
-    size_t size;
-    struct Block *next;
+typedef struct Block
+{
+	size_t size;
+	struct Block *next;
 } Block;
 
 /* free_list */
