@@ -1,8 +1,5 @@
 #include "malloc.h"
 
-/* Initialize the free list */
-Block *free_list = NULL;
-
 /**
  * naive_malloc - Allocates memory in the heap
  * @size: size of memory to allocate
@@ -10,53 +7,34 @@ Block *free_list = NULL;
  */
 void *naive_malloc(size_t size)
 {
+    static void *heap_end = NULL;
+    void *prev_heap_end;
+    void *ptr;
+    size_t aligned_size;
+
     if (size == 0)
         return NULL;
 
-    size_t aligned_size = ALIGN_SIZE(size);
-    Block *prev = NULL;
-    Block *curr = free_list;
+    /* Align size to the next page boundary */
+    aligned_size = ALIGN_SIZE(size + sizeof(size_t));
 
-    /* Search for a suitable free block */
-    while (curr != NULL) {
-        if (curr->size >= aligned_size) {
-            /* Remove the block from the free list */
-            if (prev == NULL) {
-                free_list = curr->next;
-            } else {
-                prev->next = curr->next;
-            }
-
-            /* Return the block */
-            return (char *)curr + sizeof(size_t);
-        }
-        prev = curr;
-        curr = curr->next;
+    if (heap_end == NULL) {
+        heap_end = sbrk(0);  /* Make the heap_end to whatever break is at this time */
     }
 
-    /* No suitable block found, extend the heap */
-    void *heap_end = sbrk(0);
-    void *prev_heap_end = heap_end;
+    prev_heap_end = heap_end;
+
+    /* Extend the heap */
     if (sbrk(aligned_size) == (void *)-1)
         return NULL;  /* sbrk failed */
 
-    /* Store the block size in the header */
+    heap_end = (char *)heap_end + aligned_size;  /* Update the heap_end */
+
+    /* Store the size of the block at the beginning */
     *(size_t *)prev_heap_end = aligned_size;
 
-    return (char *)prev_heap_end + sizeof(size_t);
-}
+    /* Return a pointer to the memory area just after the header */
+    ptr = (char *)prev_heap_end + sizeof(size_t);
 
-/**
- * naive_free - Frees previously allocated memory
- * @ptr: pointer to the memory to free
- */
-void naive_free(void *ptr)
-{
-    if (ptr == NULL)
-        return;
-
-    /* Get the block header */
-    Block *block = (Block *)((char *)ptr - sizeof(size_t));
-    block->next = free_list;
-    free_list = block;
+    return ptr;
 }
