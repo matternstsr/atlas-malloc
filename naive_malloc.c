@@ -21,8 +21,6 @@ void *naive_malloc(size_t size)
 
     /* Align size to the next page boundary */
     aligned_size = ALIGN_SIZE(size + sizeof(size_t));
-    printf("Requested size: %zu\n", size);
-    printf("Aligned size: %zu\n", aligned_size);
 
     /* Initialize heap_end if this is the first call */
     if (heap_end == NULL)
@@ -33,20 +31,19 @@ void *naive_malloc(size_t size)
     }
 
     prev_heap_end = heap_end;
-    printf("Previous heap end: %p\n", prev_heap_end);
 
     /* Extend heap if not enough space */
     if (sbrk(aligned_size) == (void *)-1)
         return NULL; /* sbrk failed */
     heap_end = (char *)heap_end + aligned_size; /* Update heap_end */
 
-    printf("New heap end after sbrk: %p\n", heap_end);
-
     /* Store block size at the beginning of the block */
     *(size_t *)prev_heap_end = aligned_size;
     
     /* Return pointer to the memory after the block header */
-    ptr = (char *)prev_heap_end + sizeof(size_t);
-
+    /* ptr = (char *)prev_heap_end + sizeof(size_t); */
+    ptr = (char *)prev_heap_end + (sizeof(size_t));
+    /* ptr = (char *)prev_heap_end; */
+    
     return ptr;
 }
