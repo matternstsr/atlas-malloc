@@ -9,7 +9,7 @@
 static heap_management heap = {NULL, 0, 0, 0, 0};
 
 /**
- * simple_malloc - Allocates memory from a managed space
+ * native_malloc - Allocates memory from a managed space
  * @size: The number of bytes to allocate
  * 
  * Return: Pointer to the allocated memory or NULL if allocation fails
@@ -18,7 +18,7 @@ static heap_management heap = {NULL, 0, 0, 0, 0};
  * allocations. It uses a fixed page size for alignment and ensures that
  * allocations fit within the current heap.
  */
-void *simple_malloc(size_t size)
+void *native_malloc(size_t size)
 {
     static int initialized = 0;
     size_t aligned_size;
