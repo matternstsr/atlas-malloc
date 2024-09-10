@@ -1,52 +1,35 @@
 #include "malloc.h"
 
-/* Free list */
-Block *free_list = NULL;
-
 void *naive_malloc(size_t size)
 {
-    Block *block, *prev = NULL, *best_fit = NULL;
-    size_t aligned_size = ALIGN_SIZE(size);
+    static void *heap_end = NULL;
+    void *prev_heap_end;
+    void *ptr;
+    size_t aligned_size;
 
     if (size == 0)
         return NULL;
 
-    /* go through the free list until find a good block */
-    for (block = free_list; block != NULL; block = block->next)
-    {
-        if (block->size >= aligned_size && (best_fit == NULL || block->size < best_fit->size))
-            best_fit = block;
-    }
+    /* Align size to the next page boundary, including the size of the block header */
+    aligned_size = ALIGN_SIZE(size + sizeof(size_t));
 
-    if (best_fit != NULL) {
-        /* Use the block that fits */
-        if (best_fit->size > aligned_size + sizeof(Block))
-        {
-            Block *remaining_block = (Block *)((char *)best_fit + aligned_size + sizeof(Block));
-            remaining_block->size = best_fit->size - aligned_size - sizeof(Block);
-            remaining_block->next = best_fit->next;
-            best_fit->size = aligned_size;
-            best_fit->next = remaining_block;
-        }
-        else
-        {
-            /* Take the block out of the free list */
-            if (prev == NULL)
-                free_list = best_fit->next;
-            else
-                prev->next = best_fit->next;
-        }
-        return (char *)best_fit + sizeof(Block);
-    }
+    if (heap_end == NULL)
+        heap_end = sbrk(0);  /* Make the heap_end to whatever break is at this time */
 
-    /* No good block was found, Make the block larger */
-    block = sbrk(aligned_size + sizeof(Block));
-    if (block == (void *)-1)
+    prev_heap_end = heap_end;
+    if (sbrk(aligned_size) == (void *)-1)
         return NULL;  /* sbrk didnt work */
-    block->size = aligned_size;
-    return (char *)block + sizeof(Block);
-}
+    heap_end = (char *)heap_end + aligned_size;  /* Updating the heap_end */
 
+    /* Store what size is at the beginning of the block */
+    *(size_t *)prev_heap_end = aligned_size;
+    
+    ptr = (char *)prev_heap_end + sizeof(size_t);
+    /* Store what size is at the beginning of the block */
+    /* *(size_t *)prev_heap_end = aligned_size; */
+    /*  moved  */
+    return ptr;
+}
 
 
 
