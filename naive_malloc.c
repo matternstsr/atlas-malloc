@@ -11,10 +11,12 @@ static Block *free_list = NULL;
 void *naive_malloc(size_t size) {
     static void *heap_end = NULL;
     Block *current, *prev = NULL;
+    void *ptr;
     size_t aligned_size;
 
     if (size == 0) return NULL;
 
+    /* Align size to the next page boundary */
     aligned_size = ALIGN_SIZE(size + sizeof(Block));
 
     /* Check free list for a suitable block */
