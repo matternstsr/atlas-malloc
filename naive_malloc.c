@@ -13,6 +13,7 @@ void *naive_malloc(size_t size) {
     if (size == 0) return NULL;
 
     size_t aligned_size = ALIGN_SIZE(size + BLOCK_HEADER_SIZE);
+    Block *prev = NULL;
     Block *current = free_list;
 
     /* Search free list for a suitable block */
