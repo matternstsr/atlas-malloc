@@ -1,0 +1,30 @@
+# Compiled object files
+*.o
+
+# Shared library files
+*.so
+
+# Executable files
+*.out
+*.exe
+
+# Build directory
+build/
+
+# Backup files
+*~
+*.bak
+*.swp
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Directory where gcc might place temporary files
+/gcc*
+
+# System files
+.DS_Store
