@@ -11,7 +11,6 @@ static Block *free_list = NULL;
 void *naive_malloc(size_t size) {
     static void *heap_end = NULL;
     Block *current, *prev = NULL;
-    void *ptr;
     size_t aligned_size;
 
     if (size == 0) return NULL;
@@ -23,7 +22,7 @@ void *naive_malloc(size_t size) {
     current = free_list;
     while (current) {
         if (current->free && current->size >= aligned_size) {
-            current->free = 0; // Mark block as used
+            current->free = 0;
             return (char *)current + sizeof(Block);
         }
         prev = current;
