@@ -1,31 +1,28 @@
 #ifndef MALLOC_H
 #define MALLOC_H
-#include <unistd.h>
-#include <stddef.h>
-#include <stdint.h>
 
-/* start with 4096 page size */
+#include <stddef.h>
+
+/* Define a common page size value (e.g., 4096 bytes) */
 #define PAGE_SIZE 4096
 
-/* Make the "size" to the next size up of PAGE_SIZE */
-/* #define ALIGN_SIZE(size) (((size) + sizeof(Block) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)) */
-#define ALIGN_SIZE(size) (((size) + sizeof(Block) + 7) & ~7)
-
-
 /* Struct for memory blocks */
-typedef struct Block {
+typedef struct memory_block {
     size_t size;
-    struct Block *next;
-} Block;
+    struct memory_block *next;
+} memory_block;
 
-/* free_list */
-extern Block *free_list;
+/* Struct for heap management */
+typedef struct heap_management {
+    memory_block *first_block;
+    size_t total_size;
+    size_t free_size;
+    size_t used_size;
+    size_t block_count;
+} heap_management;
 
-void *naive_malloc(size_t size);
-void *_malloc(size_t size);
-void _free(void *ptr);
+/* Prototypes */
+void *simple_malloc(size_t size);
+void simple_free(void *ptr);
 
 #endif /* MALLOC_H */
-
-
-
