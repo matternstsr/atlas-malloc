@@ -1,8 +1,10 @@
 #include "malloc.h"
 
+static void *heap_end = NULL;
+static Block *free_list = NULL;
+
 void *naive_malloc(size_t size)
 {
-    static void *heap_end = NULL;
     void *prev_heap_end;
     void *ptr;
     size_t aligned_size;
@@ -11,28 +13,48 @@ void *naive_malloc(size_t size)
         return NULL;
 
     /* Align size to the next page boundary, including the size of the block header */
-    aligned_size = ALIGN_SIZE(size + sizeof(size_t));
+    aligned_size = ALIGN_SIZE(size + sizeof(Block));
 
+    /* Initialize the heap if it is the first call */
     if (heap_end == NULL)
-        heap_end = sbrk(0);  /* Make the heap_end to whatever break is at this time */
+    {
+        heap_end = sbrk(0);
+        if (heap_end == (void *)-1)
+            return NULL; /* sbrk failed */
+
+        Add initial heap space
+        if (sbrk(PAGE_SIZE) == (void *)-1)
+            return NULL; /* sbrk failed */
+
+        heap_end = sbrk(0);
+    }
 
     prev_heap_end = heap_end;
+    /* Extend heap if there is not enough space */
     if (sbrk(aligned_size) == (void *)-1)
-        return NULL;  /* sbrk didnt work */
-    heap_end = (char *)heap_end + aligned_size;  /* Updating the heap_end */
+        return NULL; /* sbrk failed
+ */
+    heap_end = (char *)heap_end + aligned_size; /* Update heap_end */
 
-    /* Store what size is at the beginning of the block */
-    *(size_t *)prev_heap_end = aligned_size;
-    
-    ptr = (char *)prev_heap_end + sizeof(size_t);
-    /* Store what size is at the beginning of the block */
-    /* *(size_t *)prev_heap_end = aligned_size; */
-    /*  moved  */
+    /* Initialize the new block */
+    Block *new_block = (Block *)prev_heap_end;
+    new_block->size = size;
+    new_block->next = NULL;
+
+    /* Return the memory after the block header */
+    ptr = (char *)new_block + sizeof(Block);
     return ptr;
 }
 
+void _free(void *ptr)
+{
+    if (ptr == NULL)
+        return;
 
+    /* Get the block header */
+    Block *block = (Block *)((char *)ptr - sizeof(Block));
 
-
-
-
+    /* Add the block to the free list */
+    block->next = free_list;
+    free_list = block;
+}

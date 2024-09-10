@@ -1,60 +1,33 @@
-#include "malloc.h"
+#ifndef MALLOC_H
+#define MALLOC_H
+#include <unistd.h>
+#include <stddef.h>
+#include <stdint.h>
 
-static void *heap_end = NULL;
-static Block *free_list = NULL;
+/* start with 4096 page size */
+#define PAGE_SIZE 4096
 
-void *naive_malloc(size_t size)
-{
-    void *prev_heap_end;
-    void *ptr;
-    size_t aligned_size;
+/* Make the "size" to the next size up of PAGE_SIZE */
+/* #define ALIGN_SIZE(size) (((size) + sizeof(Block) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)) */
 
-    if (size == 0)
-        return NULL;
+/* Make the "size" to the next size up of PAGE_SIZE */
+#define ALIGN_SIZE(size) (((size) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
-    /* Align size to the next page boundary, including the size of the block header */
-    aligned_size = ALIGN_SIZE(size + sizeof(Block));
 
-    /* Initialize the heap if it is the first call */
-    if (heap_end == NULL)
-    {
-        heap_end = sbrk(0);
-        if (heap_end == (void *)-1)
-            return NULL; /* sbrk failed */
+/* Struct for memory blocks */
+typedef struct Block {
+    size_t size;
+    struct Block *next;
+} Block;
 
-        Add initial heap space
-        if (sbrk(PAGE_SIZE) == (void *)-1)
-            return NULL; /* sbrk failed */
+/* free_list */
+extern Block *free_list;
 
-        heap_end = sbrk(0);
-    }
+void *naive_malloc(size_t size);
+void *_malloc(size_t size);
+void _free(void *ptr);
 
-    prev_heap_end = heap_end;
-    /* Extend heap if there is not enough space */
-    if (sbrk(aligned_size) == (void *)-1)
-        return NULL; /* sbrk failed
- */
-    heap_end = (char *)heap_end + aligned_size; /* Update heap_end */
+#endif /* MALLOC_H */
 
-    /* Initialize the new block */
-    Block *new_block = (Block *)prev_heap_end;
-    new_block->size = size;
-    new_block->next = NULL;
 
-    /* Return the memory after the block header */
-    ptr = (char *)new_block + sizeof(Block);
-    return ptr;
-}
 
-void _free(void *ptr)
-{
-    if (ptr == NULL)
-        return;
-
-    /* Get the block header */
-    Block *block = (Block *)((char *)ptr - sizeof(Block));
-
-    /* Add the block to the free list */
-    block->next = free_list;
-    free_list = block;
-}
