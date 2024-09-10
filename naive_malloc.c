@@ -39,15 +39,20 @@ void *naive_malloc(size_t size)
     if (!initialized)
     {
         heap.first_block = sbrk(0);
+        if (heap.first_block == (void *)-1)
+            return NULL;  /* sbrk failed */
+
         heap.total_size = PAGE_SIZE;
-        heap.free_size = heap.total_size;
+        heap.free_size = PAGE_SIZE;
 
         /* Ensure there's enough space for the initial allocation */
         while (heap.free_size < aligned_size + HEADER_SIZE)
         {
-            sbrk(PAGE_SIZE);
+            if (sbrk(PAGE_SIZE) == (void *)-1)
+                return NULL;  /* sbrk failed */
+
             heap.total_size += PAGE_SIZE;
-            heap.free_size = heap.total_size;
+            heap.free_size += PAGE_SIZE;
         }
 
         /* Set up the first block */
@@ -61,7 +66,9 @@ void *naive_malloc(size_t size)
     /* Expand memory if needed */
     while (heap.free_size < aligned_size + HEADER_SIZE)
     {
-        sbrk(PAGE_SIZE);
+        if (sbrk(PAGE_SIZE) == (void *)-1)
+            return NULL;  /* sbrk failed */
+
         heap.total_size += PAGE_SIZE;
         heap.free_size += PAGE_SIZE;
     }
@@ -97,6 +104,7 @@ memory_block *find_block(size_t size)
         if (block_size >= size)
             return current_block;
 
+        /* Move to the next block */
         current_block = (memory_block *)((char *)current_block + HEADER_SIZE + block_size);
     }
 
