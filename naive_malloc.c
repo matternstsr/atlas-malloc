@@ -12,15 +12,15 @@ void *naive_malloc(size_t size)
     if (size == 0)
         return NULL;
 
-    /* Align size to the next page boundary, including the size of the block header */
-    aligned_size = ALIGN_SIZE(size + sizeof(size_t));
+    /* Align size to the next page boundary, included the size of the block header */
+    aligned_size = ALIGN_SIZE(size + sizeof(Block));
 
-    /* Check if the free list has a good sized usable block */
+    /* Check if the free list has a good sized open block */
     for (block = free_list; block != NULL; block = block->next)
     {
         if (block->size >= aligned_size)
         {
-            /* Good sized usable block found */
+            /* Good sized open block found */
             if (block->size > aligned_size + sizeof(Block))
             {
                 /* Split the block if too big */
@@ -32,7 +32,7 @@ void *naive_malloc(size_t size)
             }
             else
             {
-                /* Remove the block from the free list */
+                /* Take out the block from the free list */
                 if (prev == NULL)
                     free_list = block->next;
                 else
@@ -43,16 +43,16 @@ void *naive_malloc(size_t size)
         prev = block;
     }
 
-    /* No suitable block found, make the heap larger */
+    /* No good block found, make the heap bigger */
     if (heap_end == NULL)
-        heap_end = sbrk(0);  /* Make the heap_end to whatever break is at this time */
+        heap_end = sbrk(0);  /* Set heap_end if first use */
 
     prev_heap_end = heap_end;
     if (sbrk(aligned_size) == (void *)-1)
-        return NULL;  /* sbrk didnt work */
-    heap_end = (char *)heap_end + aligned_size;  /* Updating the heap_end */
+        return NULL;  /* sbrk failed */
+    heap_end = (char *)heap_end + aligned_size;  /* Updated heap_end */
 
-    /* Create a new block and return its usable portion */
+    /* Make a new block and give back its usable part */
     block = (Block *)prev_heap_end;
     block->size = aligned_size;
     return (char *)block + sizeof(Block);
@@ -67,9 +67,3 @@ void naive_free(void *ptr)
     block->next = free_list;
     free_list = block;
 }
-
-
-
-
-
-
