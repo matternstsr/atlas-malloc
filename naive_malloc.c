@@ -4,7 +4,7 @@ void *naive_malloc(size_t size)
 {
     static void *heap_end = NULL;
     void *prev_heap_end;
-    void *ptr;
+    Block *block, *prev = NULL;
     size_t aligned_size;
 
     if (size == 0)
