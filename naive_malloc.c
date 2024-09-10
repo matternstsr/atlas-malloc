@@ -48,10 +48,10 @@ void *naive_malloc(size_t size)
         heap_end = sbrk(0);  /* Set heap_end if first use */
 
     prev_heap_end = heap_end;
-    if (sbrk(aligned_size) == (void *)-1)
+    if (sbrk(aligned_size + sizeof(Block)) == (void *)-1)
         return NULL;  /* sbrk failed */
-    heap_end = (char *)heap_end + aligned_size;  /* Updated heap_end */
-
+    heap_end = (char *)heap_end + aligned_size + sizeof(Block);  /* Update heap_end */
+    
     /* Make a new block and give back its usable part */
     block = (Block *)prev_heap_end;
     block->size = aligned_size;
