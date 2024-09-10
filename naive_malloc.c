@@ -4,6 +4,10 @@
  * naive_malloc - Allocates memory in the heap
  * @size: size of memory to allocate
  * Return: returns a pointer to the allocated memory
+ * When the program starts, the heap is initialized. The sbrk(0) call gets the current end of the heap, 0x22000
+ * When naive_malloc is called, it extends the heap by the size required (plus the size of the block header).
+ * The break should only be moved once per sbrk call to allocate space, and should remain constant
+ * between allocations as long as the allocated sizes fit within the existing space.
  */
 void *naive_malloc(size_t size)
 {
