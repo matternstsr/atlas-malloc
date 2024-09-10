@@ -1,7 +1,6 @@
 #include "malloc.h"
 
-static Block *free_list = NULL;  /* The free list for managing free blocks */
-
+Block *free_list = NULL;  /* non-static */
 
 void *naive_malloc(size_t size)
 {
