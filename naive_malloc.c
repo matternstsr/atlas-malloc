@@ -19,10 +19,11 @@ void *naive_malloc(size_t size)
     prev_heap_end = heap_end;
     if (sbrk(aligned_size) == (void *)-1)
         return NULL;  /* sbrk didnt work */
-    heap_end = (char *)heap_end + aligned_size;  /* Updating the heap_end */
 
     /* Store what size is at the beginning of the block */
-    *(size_t *)prev_heap_end = aligned_size;
+    *(size_t *)prev_heap_end = size;
+
+    heap_end = (char *)heap_end + aligned_size;  /* Updating the heap_end */
     
     ptr = (char *)prev_heap_end + sizeof(size_t);
     /* Store what size is at the beginning of the block */
