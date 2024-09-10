@@ -6,14 +6,14 @@
 
 /* start with 4096 page size */
 #define PAGE_SIZE 4096
+
 /* #define PAGE_SIZE 8 */
 /* Heap might be extended too freq & could make issue with heap_end not rem const. */
-
 /* Make the "size" to the next size up of PAGE_SIZE */
 /* #define ALIGN_SIZE(size) (((size) + sizeof(Block) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)) */
 
 /* Make the "size" to the next size up of PAGE_SIZE */
-#define ALIGN_SIZE(size) (((size) + 8 - 1) & ~(8 - 1))
+#define ALIGN_SIZE(size) (((size) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 
 /* Struct for memory blocks */
