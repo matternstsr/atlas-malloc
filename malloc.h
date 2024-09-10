@@ -1,14 +1,13 @@
 #ifndef MALLOC_H
 #define MALLOC_H
-
 #include <unistd.h>
 #include <stddef.h>
 #include <stdint.h>
 
-/* Define page size */
+/* start with 4096 page size */
 #define PS 4096
 
-/* Align size to be a multiple of PS, plus the header size */
+/* Make the "size" to the next size up of PS */
 #define ALIGN_SIZE(size) (((size) + sizeof(Block) + PS - 1) & ~(PS - 1))
 
 /**
@@ -27,7 +26,10 @@ extern Block *free_list;
 
 /* Function prototypes */
 void *naive_malloc(size_t size);
-void naive_free(void *ptr);
+void *_malloc(size_t size);
+void _free(void *ptr);
 
 #endif /* MALLOC_H */
+
+
 
