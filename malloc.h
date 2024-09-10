@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /* start with 4096 page size */
-#define PAGE_SIZE 4096
+#define PAGE_SIZE 8
 
 /* #define PAGE_SIZE 8 */
 /* Heap might be extended too freq & could make issue with heap_end not rem const. */
