@@ -22,7 +22,7 @@ typedef struct heap_management {
 } heap_management;
 
 /* Prototypes */
-void *native_malloc(size_t size);
+void *naive_malloc(size_t size);
 memory_block *find_block(size_t size);
 
 #endif /* MALLOC_H */
