@@ -1,5 +1,8 @@
 #include "malloc.h"
 
+static void *heap_end = NULL;
+
+
 void *naive_malloc(size_t size)
 {
     void *prev_heap_end;

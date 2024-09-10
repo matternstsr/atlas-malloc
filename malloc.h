@@ -22,7 +22,6 @@ typedef struct Block {
 
 /* free_list */
 extern Block *free_list;
-extern void *heap_end = NULL;
 
 void *naive_malloc(size_t size);
 void *_malloc(size_t size);
