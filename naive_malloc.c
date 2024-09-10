@@ -37,7 +37,8 @@ void *naive_malloc(size_t size)
     *(size_t *)prev_heap_end = aligned_size;
     
     /* Return pointer to the memory after the block header */
-    ptr = (char *)prev_heap_end + sizeof(size_t);
+    /* ptr = (char *)prev_heap_end + sizeof(size_t); */
+    ptr = (char *)prev_heap_end + 4096 + 4096;
     /* ptr = (char *)prev_heap_end; */
 
     return ptr;
