@@ -24,5 +24,6 @@ typedef struct heap_management {
 /* Prototypes */
 void *simple_malloc(size_t size);
 void simple_free(void *ptr);
+memory_block *find_block(size_t size);
 
 #endif /* MALLOC_H */
