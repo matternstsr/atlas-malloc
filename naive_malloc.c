@@ -22,7 +22,7 @@ void *naive_malloc(size_t size)
         if (heap_end == (void *)-1)
             return NULL; /* sbrk failed */
 
-        Add initial heap space
+        /* Add initial heap space */
         if (sbrk(PAGE_SIZE) == (void *)-1)
             return NULL; /* sbrk failed */
 
@@ -32,8 +32,7 @@ void *naive_malloc(size_t size)
     prev_heap_end = heap_end;
     /* Extend heap if there is not enough space */
     if (sbrk(aligned_size) == (void *)-1)
-        return NULL; /* sbrk failed
- */
+        return NULL; /* sbrk failed */
     heap_end = (char *)heap_end + aligned_size; /* Update heap_end */
 
     /* Initialize the new block */
