@@ -1,7 +1,8 @@
 #include "malloc.h"
 
-/* Static variable for managing the free list */
+/* Static variables for heap management */
 static Block *free_list = NULL;
+static void *heap_end = NULL;
 
 /**
  * naive_malloc - Allocates memory in the heap
@@ -9,50 +10,52 @@ static Block *free_list = NULL;
  * Return: returns a pointer to the allocated memory
  */
 void *naive_malloc(size_t size) {
-    static void *heap_end = NULL;
-    Block *current, *prev = NULL;
-    size_t aligned_size;
-
     if (size == 0) return NULL;
 
-    /* Align size to 8 bytes */
-    aligned_size = ALIGN_SIZE(size + sizeof(Block));
+    size_t aligned_size = ALIGN_SIZE(size + BLOCK_HEADER_SIZE);
+    Block *prev = NULL;
+    Block *current = free_list;
 
-    /* Check free list for a suitable block */
-    current = free_list;
+    /* Search free list for a suitable block */
     while (current) {
         if (current->free && current->size >= aligned_size) {
-            current->free = 0; // Mark block as used
-            return (char *)current + sizeof(Block);
+            /* Found a suitable block */
+            if (current->size > aligned_size + BLOCK_HEADER_SIZE) {
+                /* Split the block if it's larger than needed */
+                Block *new_block = (Block *)((char *)current + aligned_size);
+                new_block->size = current->size - aligned_size;
+                new_block->next = current->next;
+                new_block->free = 1;
+                current->size = aligned_size;
+                current->next = new_block;
+            }
+            current->free = 0;
+            return (char *)current + BLOCK_HEADER_SIZE;
         }
         prev = current;
         current = current->next;
     }
 
-    /* Initialize heap_end if this is the first call */
-    if (heap_end == NULL) {
-        heap_end = sbrk(0);
-        if (heap_end == (void *)-1) return NULL;
-    }
+    /* No suitable block found, extend the heap */
+    size_t page_size = getpagesize();
+    size_t total_size = aligned_size > page_size ? aligned_size : page_size;
+    void *new_heap_end = sbrk(total_size);
 
-    /* Extend the heap */
-    if (sbrk(aligned_size) == (void *)-1) return NULL;
-    heap_end = (char *)heap_end + aligned_size;
+    if (new_heap_end == (void *)-1) return NULL;
+
+    if (heap_end == NULL) {
+        heap_end = new_heap_end;
+    }
 
     /* Initialize the new block */
-    Block *new_block = (Block *)((char *)heap_end - aligned_size);
-    new_block->size = aligned_size;
-    new_block->free = 0;
+    Block *new_block = (Block *)heap_end;
+    new_block->size = total_size;
     new_block->next = NULL;
+    new_block->free = 0;
 
-    /* Update the free list */
-    if (prev) {
-        prev->next = new_block;
-    } else {
-        free_list = new_block;
-    }
+    heap_end = (char *)heap_end + total_size;
 
-    return (char *)new_block + sizeof(Block);
+    return (char *)new_block + BLOCK_HEADER_SIZE;
 }
 
 /**
@@ -62,8 +65,29 @@ void *naive_malloc(size_t size) {
 void naive_free(void *ptr) {
     if (!ptr) return;
 
-    Block *block_to_free = (Block *)((char *)ptr - sizeof(Block));
+    Block *block_to_free = (Block *)((char *)ptr - BLOCK_HEADER_SIZE);
     block_to_free->free = 1;
 
-    /* Optionally, coalesce adjacent free blocks here */
+    /* Coalesce adjacent free blocks */
+    Block *current = free_list;
+    Block *prev = NULL;
+
+    while (current && current < block_to_free) {
+        prev = current;
+        current = current->next;
+    }
+
+    if (prev) {
+        prev->next = block_to_free;
+    } else {
+        free_list = block_to_free;
+    }
+
+    block_to_free->next = current;
+
+    /* Attempt to coalesce free blocks */
+    if (block_to_free->next && block_to_free->next->free) {
+        block_to_free->size += BLOCK_HEADER_SIZE + block_to_free->next->size;
+        block_to_free->next = block_to_free->next->next;
+    }
 }

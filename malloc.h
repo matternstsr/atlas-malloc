@@ -6,16 +6,18 @@
 #include <stdint.h>
 
 /* Align size to 8 bytes */
-#define ALIGN_SIZE(size) (((size) + 7) & ~7)  // Align to 8 bytes
+#define ALIGN_SIZE(size) (((size) + 7) & ~7)
 
-/* Struct for memory blocks */
+/* Block header size and structure */
+#define BLOCK_HEADER_SIZE sizeof(Block)
+
 typedef struct Block {
-    size_t size;         /* Size of the block including header */
-    struct Block *next;  /* Pointer to the next block in the free list */
-    int free;            /* Free status (1 if free, 0 if used) */
+    size_t size;
+    struct Block *next;
+    int free;
 } Block;
 
-/* Functions for memory management */
+/* Function prototypes */
 void *naive_malloc(size_t size);
 void naive_free(void *ptr);
 
