@@ -42,7 +42,7 @@ void *naive_malloc(size_t size)
     
     /* Return pointer to the memory after the block header */
     /* ptr = (char *)prev_heap_end + sizeof(size_t); */
-    ptr = (sizeof(size_t));
+    ptr = (char *)prev_heap_end;
     /* ptr = (char *)prev_heap_end; */
 
     return ptr;
