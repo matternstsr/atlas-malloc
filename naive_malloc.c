@@ -11,7 +11,6 @@ static Block *free_list = NULL;
 void *naive_malloc(size_t size) {
     static void *heap_end = NULL;
     Block *current, *prev = NULL;
-    void *ptr;
     size_t aligned_size;
 
     if (size == 0) return NULL;
