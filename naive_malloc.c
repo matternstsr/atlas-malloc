@@ -31,7 +31,7 @@ void *naive_malloc(size_t size) {
     }
 
     size_t total_size = size + METADATA_SIZE;
-    size_t aligned_size = ((total_size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
+    /* size_t aligned_size = ((total_size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE; */
 
     SizeClass *size_class = get_size_class(size);
     if (size_class == NULL) {
