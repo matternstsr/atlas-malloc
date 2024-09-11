@@ -6,7 +6,7 @@
 
 /* start with 4096 page size */
 /* #define PS 4096 */
-#define PS 1
+#define PS 7
 
 
 /* Make the "size" to the next size up of PS */
