@@ -1,4 +1,4 @@
-#include "malloc_new.h"
+#include "malloc.h"
 
 // Array of size classes
 static SizeClass size_classes[MAX_SIZE_CLASSES];
