@@ -1,30 +1,24 @@
 #include "malloc.h"
 
-/* Initialize the free list head */
 Block *free_list = NULL;
 
-/**
- * naive_malloc - Allocates memory in the heap
- * @size: size of memory to allocate
- * Return: returns a pointer to the allocated memory
- */
 void *naive_malloc(size_t size)
 {
     if (size == 0)
         return NULL;
 
-    Block *current = free_list;
     Block *prev = NULL;
+    Block *current = free_list;
     size_t aligned_size = ALIGN_SIZE(size);
 
-    /* Search for a suitable free block */
+    // Search the free list for a suitable block
     while (current != NULL)
     {
         if (current->size >= aligned_size)
         {
             if (current->size > aligned_size + sizeof(Block))
             {
-                /* Split the block */
+                // Split the block
                 Block *new_block = (Block *)((char *)current + aligned_size);
                 new_block->size = current->size - aligned_size;
                 new_block->next = current->next;
@@ -42,7 +36,7 @@ void *naive_malloc(size_t size)
         current = current->next;
     }
 
-    /* No suitable block found, request more memory from the OS */
+    // Request more memory from the system
     void *ptr = sbrk(aligned_size);
     if (ptr == (void *)-1)
         return NULL;
@@ -54,10 +48,6 @@ void *naive_malloc(size_t size)
     return (char *)new_block + sizeof(size_t);
 }
 
-/**
- * _free - Frees the allocated memory
- * @ptr: pointer to the memory to free
- */
 void _free(void *ptr)
 {
     if (!ptr)
