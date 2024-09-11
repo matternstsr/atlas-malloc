@@ -5,7 +5,7 @@
 ## Concepts
 For this project, you are expected to understand the following concept:
 
-Writing your own dynamic allocation library
+- [`Writing your own dynamic allocation library`](https://intranet.atlasschool.com/concepts/922))
 
 ## Resources
 Read or watch:
