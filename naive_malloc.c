@@ -10,16 +10,15 @@ Block *free_list = NULL;
  */
 void *naive_malloc(size_t size)
 {
-    static void *heap_end;
+    static void *heap_end = NULL;
     void *prev_heap_end;
-    void *ptr;
-    size_t aligned_size;
     Block *current, *prev = NULL;
+    size_t aligned_size;
 
     if (size == 0)
         return NULL;
 
-    aligned_size = ALIGN_SIZE(size);
+    aligned_size = ALIGN_SIZE(size); // Align size to the page boundary
 
     // Search for a suitable block in the free list
     current = free_list;
@@ -31,7 +30,7 @@ void *naive_malloc(size_t size)
             else
                 free_list = current->next;
 
-            // Return the memory block, excluding the header
+            // Return a pointer to the memory after the header
             return (char *)current + sizeof(Block);
         }
         prev = current;
@@ -48,11 +47,11 @@ void *naive_malloc(size_t size)
 
     heap_end = (char *)heap_end + aligned_size;
 
-    // Store the size at the beginning of the block
+    // Set the size in the block header
     ((Block *)prev_heap_end)->size = aligned_size;
-    ptr = (char *)prev_heap_end + sizeof(Block);
 
-    return ptr;
+    // Return a pointer to the memory after the header
+    return (char *)prev_heap_end + sizeof(Block);
 }
 
 /**
