@@ -1,4 +1,4 @@
-#include <naive_malloc.h>
+#include <malloc.h>
 
 static unsigned long get_page_size(void) {
 	// initalize to invalid value
