@@ -1,24 +1,32 @@
-#include <stddef.h> //size_t
-#include <sys/mman.h> //mmap
-#include <unistd.h> // sysconf(_SC_PAGESIZE)
-#include <errno.h>
+#ifndef MALLOC_H
+#define MALLOC_H
+#include <unistd.h>
+#include <stddef.h>
+#include <stdint.h>
 
-#include <stdio.h>
-#include <assert.h>
+/* start with 4096 page size */
+#define PS 4096
 
-struct page_header {
-	size_t pages;
-	size_t page_size;
-	char page_data[]; //the rest of the page(s) of memory
-};
+/* Make the "size" to the next size up of PS */
+#define ALIGN_SIZE(size) (((size) + sizeof(Block) + PS - 1) & ~(PS - 1))
 
-/** The simplest free()-ish function possible 
- *  Fails if the user has managed to modify the malloc header 
- */
-void naive_free(void* ptr);
+/**
+* struct Block - stores metadata for each memory block
+* @size: total number of bytes allocated for the block (including header)
+* @next: number of bytes used by the user (excluding header)
+*/
+typedef struct Block
+{
+	size_t size;          /* Size of the block, including the header */
+	struct Block *next;  /* Pointer to the next free block in the free list */
+} Block;
 
-void* naive_malloc(size_t size);
+/* Head of the free list */
+extern Block *free_list;
 
-void* naive_calloc(size_t nmemb, size_t size);
+/* Function prototypes */
+void *naive_malloc(size_t size);
+void *_malloc(size_t size);
+void _free(void *ptr);
 
-void* naive_realloc(void* ptr, size_t size);
+#endif /* MALLOC_H */
