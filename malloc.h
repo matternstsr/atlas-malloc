@@ -5,8 +5,8 @@
 #include <stdint.h>
 
 /* start with 4096 page size */
-/* #define PS 4096 */
-#define PS 7
+#define PS 4096
+
 
 
 /* Make the "size" to the next size up of PS */
