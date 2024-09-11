@@ -12,7 +12,7 @@ void *naive_malloc(size_t size)
 	void *ptr;
 	size_t aligned_size;
 
-	heap_end = NULL;
+	/* heap_end = NULL; */
 	if (size == 0)
 		return (NULL);
 
