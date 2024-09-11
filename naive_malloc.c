@@ -2,7 +2,7 @@
 #include <sys/mman.h> // for mmap, munmap, PROT_READ, PROT_WRITE, MAP_PRIVATE, MAP_ANONYMOUS, MAP_FAILED
 #include <unistd.h> // for sysconf
 #include <errno.h> // for errno, EINVAL
-#include <stdio.h> // for perror
+#include <stdio.h> // for perror, printf
 
 struct page_header {
     size_t pages;
@@ -46,8 +46,9 @@ static struct page_header* naive_malloc_internal(size_t size) {
     }
     size_t page_size = get_page_size();
     size_t size_with_header = size + sizeof(struct page_header);
-    size_t pages = size_with_header / page_size + 1;
+    size_t pages = (size_with_header + page_size - 1) / page_size;
     size_t mmap_size = pages * page_size;
+    
     void* ptr = mmap(0, mmap_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED) {
         return NULL;
@@ -102,4 +103,24 @@ void* naive_realloc(void* ptr, size_t size) {
         naive_free(ptr);
     }
     return new_page == NULL ? NULL : new_page->page_data;
+}
+
+void print_memory_info(void* ptr) {
+    // Print allocated pointer
+    printf("%p -> [Holberton]\n", ptr);
+    
+    // Print current break
+    void* brk = sbrk(0);
+    printf("Current break is %p\n", brk);
+}
+
+int main() {
+    // Example usage of the memory management functions
+    void* ptr = naive_malloc(8);
+    print_memory_info(ptr);
+
+    // Clean up
+    naive_free(ptr);
+    
+    return 0;
 }
