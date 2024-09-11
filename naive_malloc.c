@@ -1,4 +1,4 @@
-#include "malloc.h"
+#include "malloc_new.h"
 
 // Array of size classes
 static SizeClass size_classes[MAX_SIZE_CLASSES];
@@ -30,8 +30,8 @@ void *naive_malloc(size_t size) {
         initialized = 1;
     }
 
-    /* size_t total_size = size + METADATA_SIZE; */
-    /* size_t aligned_size = ((total_size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE; */
+    size_t total_size = size + METADATA_SIZE;
+    size_t aligned_size = ((total_size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
 
     SizeClass *size_class = get_size_class(size);
     if (size_class == NULL) {
@@ -44,7 +44,7 @@ void *naive_malloc(size_t size) {
         return block->memory;
     }
 
-    void *page = mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+    void *page = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
     if (page == MAP_FAILED) {
         return NULL; // Allocation failed
     }
