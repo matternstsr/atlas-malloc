@@ -26,7 +26,7 @@ void *naive_malloc(size_t size)
     {
         /* Initialize heap_end and start_of_heap */
         heap_end = sbrk(0);
-        if (start_of_heap == NULL) 
+        if (start_of_heap == NULL)
         {
             start_of_heap = heap_end;  /* Set start_of_heap to the initial break */
         }
@@ -46,7 +46,7 @@ void *naive_malloc(size_t size)
         ptr = (char *)prev_heap_end + sizeof(size_t);
         return (ptr);
     }
-    
+
     /* If not enough space at the beginning, use sbrk to extend the heap */
     prev_heap_end = heap_end;
     if (sbrk(aligned_size) == (void *)-1)
