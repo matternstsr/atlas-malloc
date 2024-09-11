@@ -1,39 +1,32 @@
-#ifndef MALLOC_NEW_H
-#define MALLOC_NEW_H
-
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef MALLOC_H
+#define MALLOC_H
 #include <unistd.h>
-#include <sys/mman.h>
+#include <stddef.h>
 #include <stdint.h>
-#include <string.h>
-#include <stddef.h> // For size_t
 
-// Initialize the allocator
-void init_allocator();
+/* start with 4096 page size */
+#define PS 4096
 
-// Allocate memory of a given size
-void *naive_malloc(size_t size);
+/* Make the "size" to the next size up of PS */
+#define ALIGN_SIZE(size) (((size) + sizeof(Block) + PS - 1) & ~(PS - 1))
 
-// Page size
-#define PAGE_SIZE 4096
-
-// Metadata size (size_t header)
-#define METADATA_SIZE sizeof(size_t)
-
-// Define a struct to manage allocated blocks of the same size
-typedef struct Block {
-    struct Block *next;
-    void *memory;
+/**
+* struct Block - stores metadata for each memory block
+* @size: total number of bytes allocated for the block (including header)
+* @next: number of bytes used by the user (excluding header)
+*/
+typedef struct Block
+{
+	size_t size;          /* Size of the block, including the header */
+	struct Block *next;  /* Pointer to the next free block in the free list */
 } Block;
 
-// Define a struct for each size class
-typedef struct SizeClass {
-    Block *free_list;
-    size_t size;
-} SizeClass;
+/* Head of the free list */
+extern Block *free_list;
 
-// Maximum number of size classes we will handle
-#define MAX_SIZE_CLASSES 128
+/* Function prototypes */
+void *naive_malloc(size_t size);
+void *_malloc(size_t size);
+void _free(void *ptr);
 
-#endif // MALLOC_NEW_H
+#endif /* MALLOC_H */
