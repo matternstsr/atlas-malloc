@@ -6,7 +6,8 @@
 
 /* start with 4096 page size */
 /* #define PS 4096 */
-#define PS ((size + 7) / 8) * 8
+#define PS 0
+
 
 /* Make the "size" to the next size up of PS */
 #define ALIGN_SIZE(size) (((size) + sizeof(Block) + PS - 1) & ~(PS - 1))
