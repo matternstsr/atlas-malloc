@@ -18,7 +18,8 @@ void *naive_malloc(size_t size)
     if (size == 0)
         return NULL;
 
-    aligned_size = ALIGN_SIZE(size); // Align size to the page boundary
+    // Calculate aligned size including header
+    aligned_size = ALIGN_SIZE(size + sizeof(Block));
 
     // Search for a suitable block in the free list
     current = free_list;
