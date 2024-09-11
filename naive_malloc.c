@@ -32,11 +32,11 @@ void *naive_malloc(size_t size)
         }
     }
 
-    /* Check if there's enough space at the beginning of the heap */
+    /* Check if there's enough space from start_of_heap to heap_end */
     space_available = (size_t)((char *)heap_end - (char *)start_of_heap);
     if (space_available >= aligned_size)
     {
-        /* Use the space from the beginning of the heap */
+        /* Allocate from the beginning of the heap */
         prev_heap_end = start_of_heap;
         start_of_heap = (char *)start_of_heap + aligned_size;  /* Update start_of_heap */
 
