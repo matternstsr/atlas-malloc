@@ -4,7 +4,7 @@
 #include <sys/mman.h>
 #include <stdint.h>
 #include <string.h>
-#include "malloc_new.h"
+#include "malloc.h"
 
 // Page size
 #define PAGE_SIZE 4096
