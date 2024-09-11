@@ -113,14 +113,3 @@ void print_memory_info(void* ptr) {
     void* brk = sbrk(0);
     printf("Current break is %p\n", brk);
 }
-
-int main() {
-    // Example usage of the memory management functions
-    void* ptr = naive_malloc(8);
-    print_memory_info(ptr);
-
-    // Clean up
-    naive_free(ptr);
-    
-    return 0;
-}
