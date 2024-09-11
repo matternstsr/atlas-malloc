@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /* start with 4096 page size */
-#define PS 4096
+#define PS 8
 
 /* Make the "size" to the next size up of PS */
 #define ALIGN_SIZE(size) (((size) + sizeof(Block) + PS - 1) & ~(PS - 1))
