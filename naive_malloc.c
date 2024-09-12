@@ -17,8 +17,8 @@ void *naive_malloc(size_t size)
 	if (size == 0)
 		return (NULL);
 
-	/* Align size to the next page boundary, with the size of the block hdr */
-	aligned_sz = ALIGN_SIZE(size + sizeof(size_t));
+	/* Align size to the next page boundary, with the size of the aligned_sz hdr */
+	/* aligned_sz = ALIGN_SIZE(size + sizeof(size_t)); */
 
 	if (heap_end == NULL)
 		heap_end = sbrk(0);  /* Make the heap_end to what break is right now */
@@ -31,7 +31,7 @@ void *naive_malloc(size_t size)
 	/* Store what size is at the beginning of the block */
 	*(size_t *)prev_heap_end = aligned_sz;
 
-	ptr = (char *)prev_heap_end + sizeof(size_t);
+	ptr = (char *)prev_heap_end;
 	/* Store what size is at the beginning of the block */
 	/* *(size_t *)prev_heap_end = aligned_sz; */
 	/*  moved  */
