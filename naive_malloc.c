@@ -3,8 +3,8 @@
 #define MEMORY_POOL_SIZE 1024  // Adjust size as needed for your system
 
 static uint8_t memory_pool[MEMORY_POOL_SIZE];
-/* static uint8_t *pool_end = memory_pool;
-static uint8_t *pool_current = memory_pool; */
+/* static uint8_t *pool_end = memory_pool; */
+static uint8_t *pool_current = memory_pool;
 
 /**
 * naive_malloc - Allocates memory in the heap
@@ -27,8 +27,7 @@ void *naive_malloc(size_t size)
     prev_heap_end = heap_end;
 
     if (heap_end + aligned_size > memory_pool + MEMORY_POOL_SIZE)
-        return NULL;  // Out of memory
-
+        return NULL;
     heap_end += aligned_size;
     ptr = prev_heap_end;
 
