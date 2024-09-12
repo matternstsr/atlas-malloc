@@ -31,7 +31,7 @@ void *naive_malloc(size_t size)
 	/* Store what size is at the beginning of the block */
 	/* *(size_t *)prev_heap_end = aligned_sz; */
 
-	ptr = prev_heap_end;
+	/* ptr = prev_heap_end; */
 	/* Store what size is at the beginning of the block */
 	/* *(size_t *)prev_heap_end = aligned_sz; */
 	/*  moved  */
