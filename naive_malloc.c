@@ -10,7 +10,7 @@ void *naive_malloc(size_t size)
 	static void *heap_end;
 	void *prev_heap_end;
 	void *ptr;
-	size_t aligned_sz;
+	/* size_t aligned_size; */
     size_t aligned_sz = ((size + 7) / 8) * 8;
 
 	/* heap_end = NULL; */
