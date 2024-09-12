@@ -23,7 +23,7 @@ void *naive_malloc(size_t size)
 	if (heap_end == NULL)
 		heap_end = sbrk(0);  /* Make the heap_end to what break is right now */
 
-	prev_heap_end = heap_end;
+	/* prev_heap_end = heap_end; */
 	if (sbrk(aligned_sz) == (void *)-1)
 		return (NULL);  /* sbrk didnt work */
 	heap_end = sbrk(0);  /* Updating the heap_end */
@@ -31,7 +31,7 @@ void *naive_malloc(size_t size)
 	/* Store what size is at the beginning of the block */
 	/* *(size_t *)prev_heap_end = aligned_sz; */
 
-	/* ptr = prev_heap_end; */
+	ptr = prev_heap_end;
 	/* Store what size is at the beginning of the block */
 	/* *(size_t *)prev_heap_end = aligned_sz; */
 	/*  moved  */
