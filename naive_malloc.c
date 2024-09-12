@@ -1,3 +1,12 @@
+#include "malloc.h"
+
+/* #define MEMORY_POOL_SIZE 1024  // Adjust size as needed for your system */
+
+/**
+* naive_malloc - Allocates memory in the heap
+* @size: size of memory to allocate
+* Return: returns a pointer to the allocated memory
+*/
 void *naive_malloc(size_t size)
 {
     static void *heap_end;
@@ -27,3 +36,4 @@ void *naive_malloc(size_t size)
     // Return pointer to the memory after the header
     return (void *)((char *)ptr + sizeof(Block_n));
 }
+
