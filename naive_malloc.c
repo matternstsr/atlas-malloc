@@ -1,7 +1,5 @@
 #include "malloc.h"
 
-/* #define MEMORY_POOL_SIZE 1024  // Adjust size as needed for your system */
-
 /**
 * naive_malloc - Allocates memory in the heap
 * @size: size of memory to allocate
@@ -9,31 +7,32 @@
 */
 void *naive_malloc(size_t size)
 {
-    static void *heap_end;
-    void *prev_heap_end;
-    void *ptr;
-    size_t aligned_sz = ((size + sizeof(Block_n) + 7) / 8) * 8;
-    
-    if (size == 0)
-        return NULL;
-    
-    if (heap_end == NULL)
-        heap_end = sbrk(0);
-    
-    prev_heap_end = heap_end;
-    
-    if (sbrk(aligned_sz) == (void *)-1)
-        return NULL;
-    
-    heap_end = sbrk(0);
-    
-    ptr = prev_heap_end;
-    
-    // Initialize the Block_n header
-    Block_n *block_header = (Block_n *)ptr;
-    block_header->size = aligned_sz;
-    
-    // Return pointer to the memory after the header
-    return (void *)((char *)ptr + sizeof(Block_n));
-}
+	static void *heap_end;
+	void *prev_heap_end;
+	void *ptr;
+	size_t aligned_size;
 
+	/* heap_end = NULL; */
+	if (size == 0)
+		return (NULL);
+
+	/* Align size to the next page boundary, with the size of the block hdr */
+	aligned_size = ALIGN_SIZE(size + sizeof(size_t));
+
+	if (heap_end == NULL)
+		heap_end = sbrk(0);  /* Make the heap_end to what break is right now */
+
+	prev_heap_end = heap_end;
+	if (sbrk(aligned_size) == (void *)-1)
+		return (NULL);  /* sbrk didnt work */
+	heap_end = (char *)heap_end + aligned_size;  /* Updating the heap_end */
+
+	/* Store what size is at the beginning of the block */
+	*(size_t *)prev_heap_end = aligned_size;
+
+	ptr = (char *)prev_heap_end + sizeof(size_t);
+	/* Store what size is at the beginning of the block */
+	/* *(size_t *)prev_heap_end = aligned_size; */
+	/*  moved  */
+	return (ptr);
+}
