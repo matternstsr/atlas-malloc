@@ -38,12 +38,12 @@ void *naive_malloc(size_t size) {
 
         // Check if this block has enough space
         if (total_bytes >= aligned_size) {
-            // Adjust the current block's size
-            current->total_bytes = total_bytes - aligned_size - sizeof(n_header_t);
+            // Create a new block after the allocated space
             n_header_t *next_block = (n_header_t *)((char *)current + sizeof(n_header_t) + aligned_size);
-            next_block->total_bytes = aligned_size;
+            next_block->total_bytes = total_bytes - aligned_size - sizeof(n_header_t);
+            current->total_bytes = aligned_size;
 
-            return (void *)((char *)next_block + sizeof(n_header_t));
+            return (void *)((char *)current + sizeof(n_header_t));
         }
 
         // Move to the next block
@@ -62,20 +62,3 @@ void *naive_malloc(size_t size) {
     heap.total_blocks++;
     return (void *)((char *)current + sizeof(n_header_t));
 }
-
-/**
- * n_move_block - Function for traversing the header blocks
- * @size: Size user requests plus block header
- * Return: pointer to big enough chunk for size
- */
-n_header_t *n_move_block(size_t size) {
-    n_header_t *current = heap.first_block;
-    for (size_t i = 0; i < heap.total_blocks; i++) {
-        if (current->total_bytes >= size) {
-            return current;
-        }
-        current = (n_header_t *)((char *)current + sizeof(n_header_t) + current->total_bytes);
-    }
-    return NULL; // No suitable block found
-}
-
