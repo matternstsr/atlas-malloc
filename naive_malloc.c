@@ -11,11 +11,11 @@ void *naive_malloc(size_t size) {
     if (size == 0) return NULL;
 
     // Align the requested size
-    size_t aligned_size = ((size + 7) / 8) * 8;
+    size_t aligned_size = (size + sizeof(n_header_t) + 7) & ~7;
 
     // First allocation
     if (heap.first_block == NULL) {
-        heap.first_block = sbrk(aligned_size + sizeof(n_header_t));
+        heap.first_block = sbrk(0);
         if (heap.first_block == (void *)-1) return NULL; // sbrk failed
         heap.first_block->total_bytes = aligned_size;
         heap.heap_size = aligned_size + sizeof(n_header_t);
