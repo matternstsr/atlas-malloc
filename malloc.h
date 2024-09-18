@@ -31,6 +31,21 @@ typedef struct n_header_s
 	size_t total_bytes;
 } n_header_t;
 
+/**
+ * struct n_heap_s - Struct for storing heap data
+ * @first_block: pointer to first block of metadata
+ * @heap_size: Total size of the heap in bytes
+ * @heap_free: Amount of heap free to use in bytes
+ * @total_blocks: The total number of blocks in the heap
+*/
+typedef struct n_heap_s
+{
+	n_header_t *first_block;
+	size_t heap_size;
+	size_t heap_free;
+	size_t total_blocks;
+} n_heap_t;
+
 /* Head of the free list */
 extern Block *free_list;
 
