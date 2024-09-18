@@ -9,7 +9,6 @@
 */
 void _free(void *ptr)
 {
-	free_list;
 	Block *block;
 
 	if (ptr == NULL)
