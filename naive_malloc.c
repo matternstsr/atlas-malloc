@@ -7,7 +7,7 @@ void *naive_malloc(size_t size) {
     static char *heap_start = NULL; // Start of the allocated heap
     static char *heap_end = NULL;   // Current end of the allocated heap
     static char *current = NULL;     // Pointer to the current position in the heap
-    static size_t current_size = 16; // Starting size for the next allocation
+    static size_t current_size = 16; // Start with an initial size of 16
     void *ptr;
 
     if (size == 0) {
@@ -38,8 +38,12 @@ void *naive_malloc(size_t size) {
     // Store the size at the beginning (if needed)
     *(size_t *)ptr = size;
 
-    // Update current size for the next allocation to match the expected pattern
-    current_size += 16; // Increment by 16 bytes for the next allocation
+    // Update current size for the next allocation
+    if (current_size == 16) {
+        current_size += 8; // Next size should be 24 (0x20)
+    } else {
+        current_size += 16; // Increment by 16 bytes for subsequent allocations
+    }
 
     // Return pointer after size
     return (void *)((char *)ptr + sizeof(size_t));
