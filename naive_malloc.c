@@ -31,10 +31,12 @@ void *naive_malloc(size_t size) {
 
         // Check if this block has enough space
         if (total_bytes >= aligned_size) {
-            // Create a new block after the allocated space
-            n_header_t *next_block = (n_header_t *)((char *)current + sizeof(n_header_t) + aligned_size);
-            next_block->total_bytes = total_bytes - aligned_size - sizeof(n_header_t);
-            current->total_bytes = aligned_size;
+            // If enough space, split the block
+            if (total_bytes >= aligned_size + sizeof(n_header_t) + 8) { // Check if we can split
+                n_header_t *next_block = (n_header_t *)((char *)current + sizeof(n_header_t) + aligned_size);
+                next_block->total_bytes = total_bytes - aligned_size - sizeof(n_header_t);
+                current->total_bytes = aligned_size;
+            }
 
             return (void *)((char *)current + sizeof(n_header_t));
         }
@@ -44,12 +46,13 @@ void *naive_malloc(size_t size) {
     }
 
     // No suitable block found, expand the heap
-    sbrk(aligned_size + sizeof(n_header_t));
+    void *new_block = sbrk(aligned_size + sizeof(n_header_t));
+    if (new_block == (void *)-1) return NULL; // sbrk failed
     heap.heap_size += aligned_size + sizeof(n_header_t);
     heap.heap_free -= aligned_size + sizeof(n_header_t);
 
     // Create the new block
-    current = (n_header_t *)((char *)heap.first_block + heap.heap_size - (aligned_size + sizeof(n_header_t)));
+    current = (n_header_t *)new_block;
     current->total_bytes = aligned_size;
 
     heap.total_blocks++;
