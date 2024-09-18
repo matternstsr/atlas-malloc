@@ -60,7 +60,7 @@ typedef struct n_mem_heap_s
 } n_mem_heap_t;
 
 void *naive_allocate(size_t size);
-mem_hdr_t *move_memory_block(size_t size);
+segment_header_t *move_memory_block(size_t size);
 
 void *_malloc(size_t size);
 segment_header_t *move_block(size_t size);
