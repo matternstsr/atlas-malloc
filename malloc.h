@@ -59,7 +59,7 @@ typedef struct n_mem_heap_s
 	size_t block_count;
 } n_mem_heap_t;
 
-void *naive_allocate(size_t size);
+void *naive_malloc(size_t size);
 segment_header_t *move_memory_block(size_t size);
 
 void *_malloc(size_t size);

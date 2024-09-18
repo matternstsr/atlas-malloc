@@ -7,7 +7,7 @@ static mem_heap_t mem_heap = {NULL, 0, 0, 0};
  * @requested_size: size of memory to allocate
  * Return: returns a pointer to the allocated memory
 */
-void *naive_allocate(size_t requested_size)
+void *naive_malloc(size_t requested_size)
 {
     static int is_heap;
     size_t aligned_size = ((requested_size + 7) / 8) * 8;
