@@ -1,5 +1,5 @@
-#ifndef MALLOC_H
-#define MALLOC_H
+#ifndef _MALLOC_H_
+#define _MALLOC_H_
 
 #include <pthread.h>
 #include <stdio.h>
@@ -7,27 +7,64 @@
 #include <string.h>
 #include <unistd.h>
 
-#define PS 4096
-#define ALIGN_SIZE(size) (((size) + sizeof(Block) + PS - 1) & ~(PS - 1))
+#define BLOCK_SIZE sizeof(segment_header_t)
 
-typedef struct Block {
-    size_t size;
-    struct Block *next;
-} Block;
+/**
+ * struct mem_header_s - stores header data for each block
+ * @total_bytes: total number of bytes allocated
+*/
+typedef struct mem_header_s
+{
+	size_t total_bytes;
+} mem_hdr_t;
 
-typedef struct mem_block_s {
-    size_t allocated_bytes;
-    size_t used_bytes;
-} mem_block_t;
+/**
+ * struct segment_header_s - stores header data for each block
+ * @total_bytes: total number of bytes allocated
+ * @used_bytes: number of bytes used
+*/
+typedef struct segment_header_s
+{
+	size_t total_bytes;
+	size_t used_bytes;
+} segment_header_t;
 
-typedef struct mem_heap_s {
-    mem_block_t *initial_block;
-    size_t total_size;
-    size_t free_size;
-    size_t block_count;
+/**
+ * struct mem_heap_s - Struct for storing heap data
+ * @first_segment: pointer to first block of metadata
+ * @total_size: Total size of the heap in bytes
+ * @free_size: Amount of heap free to use in bytes
+ * @block_count: The total number of blocks in the heap
+*/
+typedef struct mem_heap_s
+{
+	segment_header_t *first_segment;
+	size_t total_size;
+	size_t free_size;
+	size_t block_count;
 } mem_heap_t;
 
-void *naive_malloc(size_t size);
-mem_block_t *navigate_block(size_t size);  // Ensure this matches
+/**
+ * struct n_mem_heap_s - Struct for storing heap data
+ * @first_segment: pointer to first block of metadata
+ * @total_size: Total size of the heap in bytes
+ * @free_size: Amount of heap free to use in bytes
+ * @block_count: The total number of blocks in the heap
+*/
+typedef struct n_mem_heap_s
+{
+	mem_hdr_t *first_segment;
+	size_t total_size;
+	size_t free_size;
+	size_t block_count;
+} n_mem_heap_t;
 
-#endif /* MALLOC_H */
+void *naive_allocate(size_t size);
+mem_hdr_t *move_memory_block(size_t size);
+
+void *_malloc(size_t size);
+segment_header_t *move_block(size_t size);
+
+void _free(void *ptr);
+
+#endif

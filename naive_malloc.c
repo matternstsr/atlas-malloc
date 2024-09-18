@@ -1,53 +1,62 @@
 #include "malloc.h"
 
-static mem_heap_t memory_heap = {NULL, 0, 0, 0};
+static mem_heap_t mem_heap = {NULL, 0, 0, 0};
 
-void *naive_malloc(size_t requested_size)
+/**
+ * naive_allocate - Allocates memory in the heap
+ * @requested_size: size of memory to allocate
+ * Return: returns a pointer to the allocated memory
+*/
+
+void *naive_allocate(size_t requested_size)
 {
-    static int initialized;
-    size_t adjusted_size = ((requested_size + 7) / 8) * 8;
-    mem_block_t *block_ptr = NULL;
+	static int is_heap;
+	size_t aligned_size = ((requested_size + 7) / 8) * 8;
+	mem_hdr_t *block_pointer = NULL;
 
-    if (!initialized)
-    {
-        memory_heap.initial_block = sbrk(0);
-        while (memory_heap.total_size < (adjusted_size + sizeof(mem_block_t)))
-        {
-            sbrk(getpagesize());
-            memory_heap.total_size += getpagesize();
-            memory_heap.free_size += getpagesize();
-        }
-        memory_heap.initial_block->allocated_bytes = adjusted_size;
-        memory_heap.free_size = memory_heap.total_size - (sizeof(mem_block_t) + adjusted_size);
-        memory_heap.block_count = 1;
-        block_ptr = memory_heap.initial_block;
-        initialized = 1;
-        return ((void *) block_ptr);
-    }
-    
-    while ((adjusted_size + sizeof(mem_block_t)) > memory_heap.free_size)
-    {
-        sbrk(getpagesize());
-        memory_heap.total_size += getpagesize();
-        memory_heap.free_size += getpagesize();
-    }
-    
-    block_ptr = navigate_block((sizeof(mem_block_t) + adjusted_size));
-    memory_heap.block_count++;
-    memory_heap.free_size -= (sizeof(mem_block_t) + adjusted_size);
-    return ((void *) ++block_ptr);
+	if (!is_heap)
+	{
+		mem_heap.first_segment = sbrk(0);
+		while (mem_heap.tot_sz < (aligned_size + 8))
+		{
+			sbrk(getpagesize());
+			mem_heap.tot_sz += getpagesize(), mem_heap.free_sz += getpagesize();
+		}
+		mem_heap.first_segment->total_b = aligned_size;
+		mem_heap.free_sz = mem_heap.tot_sz - (8 + aligned_size);
+		mem_heap.block_count = 1;
+		block_pointer = mem_heap.first_segment + 1;
+		is_heap = 1;
+		return ((void *) block_pointer);
+	}
+	while ((aligned_size + 8) > mem_heap.free_sz)
+	{
+		sbrk(getpagesize());
+		mem_heap.tot_sz += getpagesize(), mem_heap.free_sz += getpagesize();
+	}
+	block_pointer = move_memory_block((8 + aligned_size));
+	mem_heap.block_count++;
+	mem_heap.free_sz -= (8 + aligned_size);
+	return ((void *) ++block_pointer);
 }
 
-mem_block_t *navigate_block(size_t size)
-{
-    size_t index = 0, total_allocated = 0;
-    mem_block_t *current_block = memory_heap.initial_block;
 
-    for (; index < memory_heap.block_count; index++)
-    {
-        total_allocated = current_block->allocated_bytes;
-        current_block = (mem_block_t *)((char *)current_block + sizeof(mem_block_t) + total_allocated);
-    }
-    current_block->allocated_bytes = size - sizeof(mem_block_t);
-    return (current_block);
+/**
+ * move_memory_block - Function for traversing the header blocks
+ * @size: Size user requests plus block header
+ * Return: pointer to big enough chunk for size
+*/
+mem_hdr_t *move_memory_block(size_t size)
+{
+	mem_hdr_t *cur_seg;
+	size_t index = 0, total_b = 0;
+
+	cur_seg = mem_heap.first_segment;
+	for (; index < mem_heap.block_count; index++)
+	{
+		total_b = cur_seg->total_b;
+		cur_seg = (mem_hdr_t *)((char *)cur_seg + sizeof(mem_hdr_t) + total_b);
+	}
+	cur_seg->total_b = size - 8;
+	return (cur_seg);
 }
