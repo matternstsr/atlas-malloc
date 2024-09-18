@@ -1,46 +1,81 @@
 #include "malloc.h"
 
-#define INITIAL_HEAP_SIZE 4096
-#define ALIGNMENT sizeof(size_t)
+static n_heap_t heap = {NULL, 0, 0, 0};
 
+/**
+ * naive_malloc - Allocates memory in the heap
+ * @size: size of memory to allocate
+ * Return: returns a pointer to the allocated memory
+ */
 void *naive_malloc(size_t size) {
-    static char *heap_start = NULL; // Start of the allocated heap
-    static char *heap_end = NULL;   // Current end of the allocated heap
-    static char *current = NULL;     // Pointer to the current position in the heap
-    static size_t current_size = 8;  // Initial allocation size
-    void *ptr;
+    if (size == 0) return NULL;
 
-    if (size == 0) {
-        return NULL;
+    // Align the requested size
+    size_t aligned_size = (size + sizeof(n_header_t) + 7) & ~7; // Round up to nearest multiple of 8
+
+    // First allocation
+    if (heap.first_block == NULL) {
+        heap.first_block = sbrk(aligned_size + sizeof(n_header_t));
+        if (heap.first_block == (void *)-1) return NULL; // sbrk failed
+        heap.first_block->total_bytes = aligned_size;
+        heap.heap_size = aligned_size + sizeof(n_header_t);
+        heap.heap_free = heap.heap_size - (aligned_size + sizeof(n_header_t));
+        heap.total_blocks = 1;
+        return (void *)((char *)heap.first_block + sizeof(n_header_t));
     }
 
-    // Initialize the heap if it hasn't been done yet
-    if (heap_start == NULL) {
-        heap_start = sbrk(INITIAL_HEAP_SIZE);
-        if (heap_start == (void *)-1) {
-            return NULL; // sbrk failed
+    // Ensure enough space in the heap
+    while (aligned_size > heap.heap_free) {
+        sbrk(getpagesize());
+        heap.heap_size += getpagesize();
+        heap.heap_free += getpagesize();
+    }
+
+    // Traverse the blocks to find a suitable space
+    n_header_t *current = heap.first_block;
+    for (size_t i = 0; i < heap.total_blocks; i++) {
+        size_t total_bytes = current->total_bytes;
+
+        // Check if this block has enough space
+        if (total_bytes >= aligned_size) {
+            // Adjust the current block's size
+            current->total_bytes = total_bytes - aligned_size - sizeof(n_header_t);
+            n_header_t *next_block = (n_header_t *)((char *)current + sizeof(n_header_t) + aligned_size);
+            next_block->total_bytes = aligned_size;
+
+            return (void *)((char *)next_block + sizeof(n_header_t));
         }
-        heap_end = heap_start + INITIAL_HEAP_SIZE;
-        current = heap_start; // Set current to start of the heap
+
+        // Move to the next block
+        current = (n_header_t *)((char *)current + sizeof(n_header_t) + total_bytes);
     }
 
-    // Align size to the nearest boundary (desired allocation size)
-    size = (current_size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
+    // No suitable block found, expand the heap
+    sbrk(aligned_size + sizeof(n_header_t));
+    heap.heap_size += aligned_size + sizeof(n_header_t);
+    heap.heap_free -= aligned_size + sizeof(n_header_t);
 
-    // Check if there's enough space left
-    if (current + size > heap_end) {
-        return NULL; // Not enough space
-    }
+    // Create the new block
+    current = (n_header_t *)((char *)heap.first_block + heap.heap_size - (aligned_size + sizeof(n_header_t)));
+    current->total_bytes = aligned_size;
 
-    ptr = current;
-    current += size; // Move the current pointer forward
-
-    // Store the size at the beginning
-    *(size_t *)ptr = size;
-
-    // Update current size for next allocation
-    current_size += 16; // Increment by 16 bytes for the next allocation
-
-    // Return pointer after size
-    return (void *)((char *)ptr + sizeof(size_t));
+    heap.total_blocks++;
+    return (void *)((char *)current + sizeof(n_header_t));
 }
+
+/**
+ * n_move_block - Function for traversing the header blocks
+ * @size: Size user requests plus block header
+ * Return: pointer to big enough chunk for size
+ */
+n_header_t *n_move_block(size_t size) {
+    n_header_t *current = heap.first_block;
+    for (size_t i = 0; i < heap.total_blocks; i++) {
+        if (current->total_bytes >= size) {
+            return current;
+        }
+        current = (n_header_t *)((char *)current + sizeof(n_header_t) + current->total_bytes);
+    }
+    return NULL; // No suitable block found
+}
+
