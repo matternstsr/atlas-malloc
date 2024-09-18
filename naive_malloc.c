@@ -24,13 +24,6 @@ void *naive_malloc(size_t size) {
         return (void *)((char *)heap.first_block + sizeof(n_header_t));
     }
 
-    // Ensure enough space in the heap
-    while (aligned_size > heap.heap_free) {
-        sbrk(getpagesize());
-        heap.heap_size += getpagesize();
-        heap.heap_free += getpagesize();
-    }
-
     // Traverse the blocks to find a suitable space
     n_header_t *current = heap.first_block;
     for (size_t i = 0; i < heap.total_blocks; i++) {
