@@ -5,27 +5,34 @@
 * @size: size of memory to allocate
 * Return: returns a pointer to the allocated memory
 */
+void *naive_malloc(size_t size)
+{
+	static void *heap_end;
+	void *prev_heap_end;
+	void *ptr;
+	size_t aligned_size;
 
-void *naive_malloc(size_t size) {
-    if (size == 0) {
-        return NULL; // No allocation needed for size 0
-    }
+	/* heap_end = NULL; */
+	if (size == 0)
+		return (NULL);
 
-    // Align the requested size
-    size_t aligned_size = ALIGN_SIZE(size + sizeof(size_t));
+	/* Align size to the next page boundary, with the size of the block hdr */
+	aligned_size = ALIGN_SIZE(size + sizeof(size_t));
 
-    // Check if there is enough space in the buffer
-    if (allocated_size + aligned_size > BUFFER_SIZE) {
-        return NULL; // Not enough space
-    }
+	if (heap_end == NULL)
+		heap_end = sbrk(0);  /* Make the heap_end to what break is right now */
 
-    // Allocate memory from the buffer
-    void *ptr = buffer + allocated_size;
-    allocated_size += aligned_size;
+	prev_heap_end = heap_end;
+	if (sbrk(aligned_size) == (void *)-1)
+		return (NULL);  /* sbrk didnt work */
+	heap_end = (char *)heap_end + aligned_size;  /* Updating the heap_end */
 
-    // Store the size at the beginning of the block
-    *(size_t *)ptr = aligned_size;
+	/* Store what size is at the beginning of the block */
+	*(size_t *)prev_heap_end = aligned_size;
 
-    // Return pointer to the user
-    return (char *)ptr + sizeof(size_t);
+	ptr = (char *)prev_heap_end + sizeof(size_t);
+	/* Store what size is at the beginning of the block */
+	/* *(size_t *)prev_heap_end = aligned_size; */
+	/*  moved  */
+	return (ptr);
 }
