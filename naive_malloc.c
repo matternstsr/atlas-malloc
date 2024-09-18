@@ -11,7 +11,7 @@ void *naive_malloc(size_t size) {
     if (size == 0) return NULL;
 
     // Align the requested size
-    size_t aligned_size = (size + sizeof(n_header_t) + 7) & ~7;
+    size_t aligned_size = ((size + 7) / 8) * 8;
 
     // First allocation
     if (heap.first_block == NULL) {
