@@ -10,34 +10,35 @@ static n_heap_t heap = {NULL, 0, 0, 0};
 
 void *naive_malloc(size_t size)
 {
-	static int flag;
+	static int is_heap;
 	size_t aligned_sz = ((size + 7) / 8) * 8;
-	n_header_t *ptr = NULL;
+	segment_header_t *block_pointer = NULL;
 
-	if (!flag)
+	if (!is_heap)
 	{
-		heap.first_block = sbrk(0);
-		while (heap.heap_size < (aligned_sz + 8))
+		heap.first_segment = sbrk(0);
+		while (heap.tot_sz < (aligned_sz + 8))
 		{
 			sbrk(getpagesize());
-			heap.heap_size += getpagesize(), heap.heap_free += getpagesize();
+			heap.tot_sz += getpagesize();
+			heap.free_sz += getpagesize();
 		}
-		heap.first_block->total_bytes = aligned_sz;
-		heap.heap_free = heap.heap_size - (8 + aligned_sz);
-		heap.total_blocks = 1;
-		ptr = heap.first_block + 1;
-		flag = 1;
-		return ((void *) ptr);
+		heap.first_segment->total_b = aligned_sz;
+		heap.free_sz = heap.tot_sz - (8 + aligned_sz);
+		heap.block_count = 1;
+		block_pointer = heap.first_segment + 1;
+		is_heap = 1;
+		return ((void *) block_pointer);
 	}
-	while ((aligned_sz + 8) > heap.heap_free)
+	while ((aligned_sz + 8) > heap.free_sz)
 	{
 		sbrk(getpagesize());
-		heap.heap_size += getpagesize(), heap.heap_free += getpagesize();
+		heap.tot_sz += getpagesize(), heap.free_sz += getpagesize();
 	}
-	ptr = n_move_block((8 + aligned_sz));
-	heap.total_blocks++;
-	heap.heap_free -= (8 + aligned_sz);
-	return ((void *) ++ptr);
+	block_pointer = n_move_block((8 + aligned_sz));
+	heap.block_count++;
+	heap.free_sz -= (8 + aligned_sz);
+	return ((void *) ++block_pointer);
 }
 
 
@@ -46,17 +47,17 @@ void *naive_malloc(size_t size)
  * @size: Size user requests plus block header
  * Return: pointer to big enough chunk for size
 */
-n_header_t *n_move_block(size_t size)
+segment_header_t *n_move_block(size_t size)
 {
-	size_t i = 0, total = 0;
-	n_header_t *current;
+    segment_header_t *cur_seg;
+    size_t index = 0, total_b = 0;
 
-	current = heap.first_block;
-	for (; i < heap.total_blocks; i++)
+	cur_seg = heap.first_segment;
+	for (; i < heap.block_count; i++)
 	{
-		total = current->total_bytes;
-		current = (n_header_t *)((char *)current + sizeof(n_header_t) + total);
+		total_b = cur_seg->total_b;
+		cur_seg = (segment_header_t *)((char *)cur_seg + sizeof(segment_header_t) + total_b);
 	}
-	current->total_bytes = size - 8;
-	return (current);
+	cur_seg->total_b = size - 8;
+	return (cur_seg);
 }
