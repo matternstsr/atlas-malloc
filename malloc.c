@@ -9,7 +9,7 @@ void *_malloc(size_t size)
 	size_t aligned_size = ALIGN_SIZE(size);
 
 	if (size == 0)
-		return NULL;
+		return (NULL);
 
 	/* go through the free list until find a good block */
 	for (block = free_list; block != NULL; block = block->next)
@@ -36,13 +36,13 @@ void *_malloc(size_t size)
 			else
 				prev->next = best_fit->next;
 		}
-		return (char *)best_fit + sizeof(Block);
+		return ((char *)best_fit + sizeof(Block));
 	}
 
 	/* No good block was found, Make the block larger */
 	block = sbrk(aligned_size + sizeof(Block));
 	if (block == (void *)-1)
-		return NULL;  /* sbrk didnt work */
+		return (NULL);  /* sbrk didnt work */
 	block->size = aligned_size;
-	return (char *)block + sizeof(Block);
+	return ((char *)block + sizeof(Block));
 }
