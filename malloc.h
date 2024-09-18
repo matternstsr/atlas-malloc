@@ -1,5 +1,6 @@
 #ifndef MALLOC_H
 #define MALLOC_H
+
 #include <unistd.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -35,20 +36,27 @@ typedef struct Block_n
 } Block_n;
 
 
+/**
+ * struct n_header_s - stores header data for each block
+ * @total_bytes: total number of bytes allocated
+ */
 typedef struct n_header_s {
     size_t total_bytes; // Total bytes allocated (including this header)
 } n_header_t;
 
+/**
+ * struct n_heap_s - Struct for storing heap data
+ * @first_block: pointer to first block of metadata
+ * @heap_size: Total size of the heap in bytes
+ * @heap_free: Amount of heap free to use in bytes
+ * @total_blocks: The total number of blocks in the heap
+ */
 typedef struct n_heap_s {
     n_header_t *first_block; // Pointer to first block of metadata
     size_t heap_size;        // Total size of the heap in bytes
     size_t heap_free;        // Amount of heap free to use in bytes
     size_t total_blocks;     // The total number of blocks in the heap
 } n_heap_t;
-
-void *naive_malloc(size_t size);
-n_header_t *n_move_block(size_t size);
-
 
 /* Head of the free list */
 extern Block *free_list;
@@ -57,6 +65,8 @@ extern Block *free_list;
 void *naive_malloc(size_t size);
 void *_malloc(size_t size);
 void _free(void *ptr);
+void *naive_malloc(size_t size);
+n_header_t *n_move_block(size_t size);
 
 #endif /* MALLOC_H */
 
