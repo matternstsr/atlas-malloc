@@ -1,70 +1,32 @@
-#ifndef _MALLOC_H_
-#define _MALLOC_H_
-
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef MALLOC_H
+#define MALLOC_H
 #include <unistd.h>
+#include <stddef.h>
+#include <stdint.h>
 
-#define BLOCK_SIZE sizeof(segment_header_t)
+/* start with 4096 page size */
+#define PS 4096
 
-/**
- * struct mem_header_s - stores header data for each block
- * @total_b: total number of bytes allocated
-*/
-typedef struct mem_header_s
-{
-	size_t total_b;
-} mem_hdr_t;
+/* Make the "size" to the next size up of PS */
+#define ALIGN_SIZE(size) (((size) + sizeof(Block) + PS - 1) & ~(PS - 1))
 
 /**
- * struct segment_header_s - stores header data for each block
- * @total_b: total number of bytes allocated
- * @used_bytes: number of bytes used
+* struct Block - stores metadata for each memory block
+* @size: total number of bytes allocated for the block (including header)
+* @next: number of bytes used by the user (excluding header)
 */
-typedef struct segment_header_s
+typedef struct Block
 {
-	size_t total_b;
-	size_t used_bytes;
-} segment_header_t;
+	size_t size;          /* Size of the block, including the header */
+	struct Block *next;  /* Pointer to the next free block in the free list */
+} Block;
 
-/**
- * struct mem_heap_s - Struct for storing heap data
- * @first_segment: pointer to first block of metadata
- * @tot_sz: Total size of the heap in bytes
- * @free_sz: Amount of heap free to use in bytes
- * @block_count: The total number of blocks in the heap
-*/
-typedef struct mem_heap_s
-{
-	segment_header_t *first_segment;
-	size_t tot_sz;
-	size_t free_sz;
-	size_t block_count;
-} mem_heap_t;
+/* Head of the free list */
+extern Block *free_list;
 
-/**
- * struct n_mem_heap_s - Struct for storing heap data
- * @first_segment: pointer to first block of metadata
- * @tot_sz: Total size of the heap in bytes
- * @free_sz: Amount of heap free to use in bytes
- * @block_count: The total number of blocks in the heap
-*/
-typedef struct n_mem_heap_s
-{
-	mem_hdr_t *first_segment;
-	size_t tot_sz;
-	size_t free_sz;
-	size_t block_count;
-} n_mem_heap_t;
-
+/* Function prototypes */
 void *naive_malloc(size_t size);
-segment_header_t *move_memory_block(size_t size);
-
 void *_malloc(size_t size);
-segment_header_t *move_block(size_t size);
-
 void _free(void *ptr);
 
-#endif
+#endif /* MALLOC_H */
