@@ -58,6 +58,29 @@ typedef struct mem_block_s
     size_t used_bytes;
 } mem_block_t;
 
+/**
+ * struct mem_heap_s - Struct for storing heap data
+ * @initial_block: pointer to first block of metadata
+ * @total_size: Total size of the heap in bytes
+ * @free_size: Amount of heap free to use in bytes
+ * @block_count: The total number of blocks in the heap
+*/
+typedef struct mem_heap_s
+{
+    mem_block_t *initial_block;
+    size_t total_size;
+    size_t free_size;
+    size_t block_count;
+} mem_heap_t;
+
+void *simple_malloc(size_t size);
+mem_header_t *navigate_block(size_t size);
+
+void *_my_malloc(size_t size);
+mem_block_t *move_block(size_t size);
+
+void _my_free(void *ptr);
+
 /* Head of the free list */
 extern Block *free_list;
 
