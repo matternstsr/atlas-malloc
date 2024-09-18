@@ -5,36 +5,34 @@
 * @size: size of memory to allocate
 * Return: returns a pointer to the allocated memory
 */
-void *naive_malloc(size_t size)
-{
-	static void *heap_end;
-	void *prev_heap_end;
-	void *ptr;
-	/* size_t aligned_size; */
-    size_t aligned_sz = ((size + 7) / 8) * 8;
 
-	/* heap_end = NULL; */
-	if (size == 0)
-		return (NULL);
+void *naive_malloc(size_t size) {
+    static void *heap_end = NULL;  // Static variable to keep track of heap end
+    void *prev_heap_end;
+    void *ptr;
+    size_t aligned_size;
 
-	/* Align size to the next page boundary, with the size of the block hdr */
-	/* aligned_size = ALIGN_SIZE(size + sizeof(size_t)); */
+    if (size == 0)
+        return NULL;
 
-	if (heap_end == NULL)
-		heap_end = sbrk(0);  /* Make the heap_end to what break is right now */
+    // Align size to the next page boundary
+    aligned_size = ALIGN_SIZE(size + sizeof(size_t));
 
-	prev_heap_end = heap_end;
-	if (sbrk(aligned_sz + 8) == (void *)-1)
-		return (NULL);  /* sbrk didnt work */
-	heap_end = sbrk (0);
-	/* Updating the heap_end */
+    if (heap_end == NULL) {
+        heap_end = sbrk(0);  // Initialize heap_end to current break
+    }
 
-	/* Store what size is at the beginning of the block */
-	/* *(size_t *)prev_heap_end = aligned_size; */
+    prev_heap_end = heap_end;
+    if (sbrk(aligned_size) == (void *)-1)
+        return NULL;  // sbrk failed
 
-	ptr = (char *)prev_heap_end + 8;
-	/* Store what size is at the beginning of the block */
-	/* *(size_t *)prev_heap_end = aligned_size; */
-	/*  moved  */
-	return (ptr);
+    // Update heap_end to reflect the new break
+    heap_end = (char *)prev_heap_end + aligned_size;
+
+    // Store the size of the block at the beginning
+    *(size_t *)prev_heap_end = aligned_size;
+
+    // Return a pointer to the memory just after the size
+    ptr = (char *)prev_heap_end + sizeof(size_t);
+    return ptr;
 }
