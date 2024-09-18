@@ -11,7 +11,7 @@ void *naive_malloc(size_t requested_size)
 {
     static int is_heap;
     size_t aligned_size = ((requested_size + 7) / 8) * 8;
-    segment_header_t *block_pointer = NULL;  // Change type to segment_header_t*
+    segment_header_t *block_pointer = NULL;
 
     if (!is_heap)
     {
@@ -23,7 +23,7 @@ void *naive_malloc(size_t requested_size)
             mem_heap.free_sz += getpagesize();
         }
         mem_heap.first_segment->total_b = aligned_size;
-        mem_heap.first_segment->used_bytes = 0;  // Initialize used bytes
+        /* mem_heap.first_segment->used_bytes = 0; */
         mem_heap.free_sz = mem_heap.tot_sz - (8 + aligned_size);
         mem_heap.block_count = 1;
         block_pointer = mem_heap.first_segment + 1;
