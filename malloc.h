@@ -21,6 +21,16 @@ typedef struct Block
 	struct Block *next;  /* Pointer to the next free block in the free list */
 } Block;
 
+
+/**
+ * struct n_header_s - stores header data for each block
+ * @total_bytes: total number of bytes allocated
+*/
+typedef struct n_header_s
+{
+	size_t total_bytes;
+} n_header_t;
+
 /* Head of the free list */
 extern Block *free_list;
 
@@ -28,5 +38,8 @@ extern Block *free_list;
 void *naive_malloc(size_t size);
 void *_malloc(size_t size);
 void _free(void *ptr);
+
+void *naive_malloc(size_t size);
+n_header_t *n_move_block(size_t size);
 
 #endif /* MALLOC_H */
