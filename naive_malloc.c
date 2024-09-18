@@ -16,7 +16,7 @@ void *naive_malloc(size_t requested_size)
     if (!is_heap)
     {
         mem_heap.first_segment = sbrk(0);
-        while (mem_heap.tot_sz < (aligned_size + sizeof(segment_header_t)))
+        while (mem_heap.tot_sz < (aligned_size + 8))
         {
             sbrk(getpagesize());
             mem_heap.tot_sz += getpagesize();
@@ -24,21 +24,21 @@ void *naive_malloc(size_t requested_size)
         }
         mem_heap.first_segment->total_b = aligned_size;
         mem_heap.first_segment->used_bytes = 0;  // Initialize used bytes
-        mem_heap.free_sz = mem_heap.tot_sz - (sizeof(segment_header_t) + aligned_size);
+        mem_heap.free_sz = mem_heap.tot_sz - (8 + aligned_size);
         mem_heap.block_count = 1;
         block_pointer = mem_heap.first_segment + 1;
         is_heap = 1;
         return ((void *)block_pointer);
     }
-    while ((aligned_size + sizeof(segment_header_t)) > mem_heap.free_sz)
+    while ((aligned_size  + 8) > mem_heap.free_sz)
     {
         sbrk(getpagesize());
         mem_heap.tot_sz += getpagesize();
         mem_heap.free_sz += getpagesize();
     }
-    block_pointer = (segment_header_t *)move_memory_block((sizeof(segment_header_t) + aligned_size));
+    block_pointer = (segment_header_t *)move_memory_block(8 + aligned_size);
     mem_heap.block_count++;
-    mem_heap.free_sz -= (sizeof(segment_header_t) + aligned_size);
+    mem_heap.free_sz -= (8 + aligned_size);
     return ((void *)++block_pointer);
 }
 
@@ -58,6 +58,6 @@ segment_header_t *move_memory_block(size_t size)
         total_b = cur_seg->total_b;
         cur_seg = (segment_header_t *)((char *)cur_seg + sizeof(segment_header_t) + total_b);
     }
-    cur_seg->total_b = size - sizeof(segment_header_t);
+    cur_seg->total_b = size - 8;
     return cur_seg;
 }
