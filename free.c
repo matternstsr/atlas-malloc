@@ -9,7 +9,7 @@ void _free(void *ptr)
     Block *prev = NULL;
     while (current != NULL && current < block)
     {
-        prev = current
+        prev = current:
         current = current->next;
     }
     block->next = current;
