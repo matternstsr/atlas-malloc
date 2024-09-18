@@ -2,6 +2,11 @@
 
 #define INITIAL_HEAP_SIZE 4096
 
+/**
+* naive_malloc - Allocates memory in the heap
+* @size: size of memory to allocate
+* Return: returns a pointer to the allocated memory
+*/
 void *naive_malloc(size_t size) {
     static char *heap_start = NULL; // Start of the allocated heap
     static char *heap_end = NULL;   // Current end of the allocated heap
@@ -33,5 +38,6 @@ void *naive_malloc(size_t size) {
     // Store the size at the beginning (if needed)
     *(size_t *)ptr = size;
 
-    return (void *)(ptr + sizeof(size_t)); // Return pointer after size
+    // Return pointer after size
+    return (void *)((char *)ptr + sizeof(size_t));
 }
