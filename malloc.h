@@ -9,6 +9,7 @@
 
 /* Make the "size" to the next size up of PS */
 #define ALIGN_SIZE(size) (((size) + sizeof(Block) + PS - 1) & ~(PS - 1))
+#define ALIGN_SIZED(size) (((size) + 7) & ~7)  // Align to 8 bytes
 
 /**
 * struct Block - stores metadata for each memory block
