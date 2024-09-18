@@ -15,7 +15,7 @@ void *naive_malloc(size_t size) {
 
     // First allocation
     if (heap.first_block == NULL) {
-        heap.first_block = sbrk(0);
+        heap.first_block = sbrk(aligned_size + sizeof(n_header_t));
         if (heap.first_block == (void *)-1) return NULL; // sbrk failed
         heap.first_block->total_bytes = aligned_size;
         heap.heap_size = aligned_size + sizeof(n_header_t);
@@ -65,11 +65,17 @@ void *naive_malloc(size_t size) {
  * @size: Size user requests plus block header
  * Return: pointer to big enough chunk for size
  */
-n_header_t *n_move_block(size_t size) {
-    n_header_t *current = heap.first_block;
-    for (size_t i = 0; i < heap.total_blocks; i++) {
-        current = (n_header_t *)((char *)current + sizeof(n_header_t) + current->total_bytes);
-    }
-    current->total_bytes = size; // Set new block size
-    return current;
+n_header_t *n_move_block(size_t size)
+{
+	size_t i = 0, total = 0;
+	n_header_t *current;
+
+	current = heap.first_block;
+	for (; i < heap.total_blocks; i++)
+	{
+		total = current->total_bytes;
+		current = (n_header_t *)((char *)current + sizeof(n_header_t) + total);
+	}
+	current->total_bytes = size - 8;
+	return (current);
 }
