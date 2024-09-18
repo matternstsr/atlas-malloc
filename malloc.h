@@ -12,9 +12,10 @@
  */#define ALIGN_SIZED(size) (((size) + 7) & ~7)  // Align to 8 bytes
 
 #define ALIGN_SIZE(size) (((size) + 7) & ~7)  // Align to 8 bytes
-#define BUFFER_SIZE 4096  // Total size of the buffer
+/* #define BUFFER_SIZE 4096  // Total size of the buffer */
 static char buffer[BUFFER_SIZE]; // Static buffer for allocation
-static size_t allocated_size = 0; // Track allocated size
+/* static size_t allocated_size = 0; // Track allocated size */
+
 /**
 * struct Block - stores metadata for each memory block
 * @size: total number of bytes allocated for the block (including header)
