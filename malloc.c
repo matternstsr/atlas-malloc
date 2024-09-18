@@ -1,7 +1,12 @@
 #include "malloc.h"
 
 Block *free_list = NULL;
-
+/**
+ * _malloc - Allocates memory in the heap using a best-fit strategy
+ * @size: size of memory to allocate
+ * 
+ * Return: ret a ptr to the memory, or NULL if fails or size is zero.
+ */
 void *_malloc(size_t size)
 {
 	Block *block, *prev = NULL, *best_fit = NULL;
