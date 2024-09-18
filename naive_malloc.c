@@ -7,23 +7,25 @@
 */
 
 void *naive_malloc(size_t size) {
-    static void *heap_end = NULL;
-    void *prev_heap_end;
-    size_t aligned_size;
+    if (size == 0) {
+        return NULL; // No allocation needed for size 0
+    }
 
-    if (size == 0)
-        return NULL;
+    // Align the requested size
+    size_t aligned_size = ALIGN_SIZE(size + sizeof(size_t));
 
-    aligned_size = ALIGN_SIZED(size + sizeof(size_t));
+    // Check if there is enough space in the buffer
+    if (allocated_size + aligned_size > BUFFER_SIZE) {
+        return NULL; // Not enough space
+    }
 
-    if (heap_end == NULL)
-        heap_end = sbrk(0);  // Initial heap end
+    // Allocate memory from the buffer
+    void *ptr = buffer + allocated_size;
+    allocated_size += aligned_size;
 
-    prev_heap_end = heap_end;
-    if (sbrk(aligned_size) == (void *)-1)
-        return NULL;  // sbrk failed
-    heap_end = (char *)heap_end + aligned_size;  // Update heap end
+    // Store the size at the beginning of the block
+    *(size_t *)ptr = aligned_size;
 
-    *(size_t *)prev_heap_end = aligned_size;  // Store size
-    return (char *)prev_heap_end + sizeof(size_t);  // Return pointer
+    // Return pointer to the user
+    return (char *)ptr + sizeof(size_t);
 }
