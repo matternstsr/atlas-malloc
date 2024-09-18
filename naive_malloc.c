@@ -1,38 +1,37 @@
 #include "malloc.h"
 
-/**
-* naive_malloc - Allocates memory in the heap
-* @size: size of memory to allocate
-* Return: returns a pointer to the allocated memory
-*/
+#define INITIAL_HEAP_SIZE 4096
 
 void *naive_malloc(size_t size) {
-    static void *heap_end = NULL;  // Static variable to keep track of heap end
-    void *prev_heap_end;
+    static char *heap_start = NULL; // Start of the allocated heap
+    static char *heap_end = NULL;   // Current end of the allocated heap
+    static char *current = NULL;     // Pointer to the current position in the heap
     void *ptr;
-    size_t aligned_size;
 
-    if (size == 0)
+    if (size == 0) {
         return NULL;
-
-    // Align size to the next page boundary
-    aligned_size = ALIGN_SIZE(size + sizeof(size_t));
-
-    if (heap_end == NULL) {
-        heap_end = sbrk(0);  // Initialize heap_end to current break
     }
 
-    prev_heap_end = heap_end;
-    if (sbrk(aligned_size) == (void *)-1)
-        return NULL;  // sbrk failed
+    // Initialize the heap if it hasn't been done yet
+    if (heap_start == NULL) {
+        heap_start = sbrk(INITIAL_HEAP_SIZE);
+        if (heap_start == (void *)-1) {
+            return NULL; // sbrk failed
+        }
+        heap_end = heap_start + INITIAL_HEAP_SIZE;
+        current = heap_start; // Set current to start of the heap
+    }
 
-    // Update heap_end to reflect the new break
-    heap_end = (char *)prev_heap_end + aligned_size;
+    // Check if there's enough space left
+    if (current + size > heap_end) {
+        return NULL; // Not enough space
+    }
 
-    // Store the size of the block at the beginning
-    *(size_t *)prev_heap_end = aligned_size;
+    ptr = current;
+    current += size; // Move the current pointer forward
 
-    // Return a pointer to the memory just after the size
-    ptr = (char *)prev_heap_end + sizeof(size_t);
-    return ptr;
+    // Store the size at the beginning (if needed)
+    *(size_t *)ptr = size;
+
+    return (void *)(ptr + sizeof(size_t)); // Return pointer after size
 }
