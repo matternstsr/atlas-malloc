@@ -11,21 +11,21 @@
 
 /**
  * struct mem_header_s - stores header data for each block
- * @total_bytes: total number of bytes allocated
+ * @total_b: total number of bytes allocated
 */
 typedef struct mem_header_s
 {
-	size_t total_bytes;
+	size_t total_b;
 } mem_hdr_t;
 
 /**
  * struct segment_header_s - stores header data for each block
- * @total_bytes: total number of bytes allocated
+ * @total_b: total number of bytes allocated
  * @used_bytes: number of bytes used
 */
 typedef struct segment_header_s
 {
-	size_t total_bytes;
+	size_t total_b;
 	size_t used_bytes;
 } segment_header_t;
 
