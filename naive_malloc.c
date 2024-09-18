@@ -1,12 +1,14 @@
 #include "malloc.h"
 
 #define INITIAL_HEAP_SIZE 4096
+#define ALIGNMENT sizeof(size_t)
 
 /**
 * naive_malloc - Allocates memory in the heap
 * @size: size of memory to allocate
 * Return: returns a pointer to the allocated memory
 */
+
 void *naive_malloc(size_t size) {
     static char *heap_start = NULL; // Start of the allocated heap
     static char *heap_end = NULL;   // Current end of the allocated heap
@@ -26,6 +28,9 @@ void *naive_malloc(size_t size) {
         heap_end = heap_start + INITIAL_HEAP_SIZE;
         current = heap_start; // Set current to start of the heap
     }
+
+    // Align the size to the nearest boundary
+    size = (size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
 
     // Check if there's enough space left
     if (current + size > heap_end) {
