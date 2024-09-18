@@ -35,9 +35,9 @@ void *naive_malloc(size_t size) {
             if (total_bytes >= aligned_size + sizeof(n_header_t) + 8) { // Ensure we can split
                 n_header_t *next_block = (n_header_t *)((char *)current + sizeof(n_header_t) + aligned_size);
                 next_block->total_bytes = total_bytes - aligned_size - sizeof(n_header_t);
-                current->total_bytes = aligned_size;
+                current->total_bytes = aligned_size; // Adjust current block size
             }
-            return (void *)((char *)current + sizeof(n_header_t));
+            return (void *)((char *)current + sizeof(n_header_t)); // Return usable memory pointer
         }
 
         // Move to the next block
@@ -48,14 +48,14 @@ void *naive_malloc(size_t size) {
     void *new_block = sbrk(aligned_size + sizeof(n_header_t));
     if (new_block == (void *)-1) return NULL; // sbrk failed
 
-    // Update heap metadata
-    heap.heap_size += aligned_size + sizeof(n_header_t);
-    heap.heap_free -= aligned_size + sizeof(n_header_t);
-
     // Create the new block
     current = (n_header_t *)new_block;
     current->total_bytes = aligned_size;
 
+    // Update heap metadata
+    heap.heap_size += aligned_size + sizeof(n_header_t);
+    heap.heap_free -= aligned_size + sizeof(n_header_t);
     heap.total_blocks++;
-    return (void *)((char *)current + sizeof(n_header_t));
+
+    return (void *)((char *)current + sizeof(n_header_t)); // Return usable memory pointer
 }
