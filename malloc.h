@@ -32,14 +32,14 @@ typedef struct segment_header_s
 /**
  * struct mem_heap_s - Struct for storing heap data
  * @first_segment: pointer to first block of metadata
- * @total_size: Total size of the heap in bytes
+ * @tot_sz: Total size of the heap in bytes
  * @free_size: Amount of heap free to use in bytes
  * @block_count: The total number of blocks in the heap
 */
 typedef struct mem_heap_s
 {
 	segment_header_t *first_segment;
-	size_t total_size;
+	size_t tot_sz;
 	size_t free_size;
 	size_t block_count;
 } mem_heap_t;
@@ -47,14 +47,14 @@ typedef struct mem_heap_s
 /**
  * struct n_mem_heap_s - Struct for storing heap data
  * @first_segment: pointer to first block of metadata
- * @total_size: Total size of the heap in bytes
+ * @tot_sz: Total size of the heap in bytes
  * @free_size: Amount of heap free to use in bytes
  * @block_count: The total number of blocks in the heap
 */
 typedef struct n_mem_heap_s
 {
 	mem_hdr_t *first_segment;
-	size_t total_size;
+	size_t tot_sz;
 	size_t free_size;
 	size_t block_count;
 } n_mem_heap_t;
