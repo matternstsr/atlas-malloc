@@ -13,6 +13,7 @@ void *naive_malloc(size_t size) {
     static char *heap_start = NULL; // Start of the allocated heap
     static char *heap_end = NULL;   // Current end of the allocated heap
     static char *current = NULL;     // Pointer to the current position in the heap
+    static size_t current_size = 8;  // Starting size for allocation
     void *ptr;
 
     if (size == 0) {
@@ -30,7 +31,7 @@ void *naive_malloc(size_t size) {
     }
 
     // Align the size to the nearest boundary
-    size = (size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
+    size = (current_size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
 
     // Check if there's enough space left
     if (current + size > heap_end) {
@@ -42,6 +43,9 @@ void *naive_malloc(size_t size) {
 
     // Store the size at the beginning (if needed)
     *(size_t *)ptr = size;
+
+    // Update current size for next allocation
+    current_size += 8; // Increment by 8 bytes for the next allocation
 
     // Return pointer after size
     return (void *)((char *)ptr + sizeof(size_t));
